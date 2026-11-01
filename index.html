@@ -642,7 +642,8 @@ function tickPomo() {
   const left = Math.max(0, p.endAt ? p.endAt - Date.now() : p.left);
   const sec = Math.ceil(left / 1000);
   document.getElementById("pomoTime").textContent = `${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`;
-  document.getElementById("pomoArc").style.strokeDashoffset = ARC * (1 - left / POMO_MS);
+  // Negative offset trims the arc from its start, so the elapsed part sweeps clockwise from 12 o'clock.
+  document.getElementById("pomoArc").style.strokeDashoffset = -ARC * (1 - left / POMO_MS);
   document.getElementById("pomoPause").textContent = p.endAt ? "Tạm dừng" : "Tiếp tục";
   document.getElementById("pomoSub").innerHTML = p.endAt
     ? `Đang tập trung. Xong sẽ tự tick vào ô <b style="color:var(--text)">${fmtDate(nextBox())}</b>.`
