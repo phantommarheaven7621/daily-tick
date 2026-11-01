@@ -79,7 +79,7 @@
   .month .d.future { background: transparent; border-style: dashed; color: var(--faint); }
   .month .d.today { outline: 2px solid var(--text); outline-offset: 2px; }
   .month .d.sel { box-shadow: 0 0 0 3px #4E6A1C; }
-  .month .d.before { visibility: hidden; }
+  .month .d.before { background: transparent; border-color: transparent; color: var(--faint); opacity: .35; }
   .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: 12px; color: var(--muted); }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
@@ -152,6 +152,26 @@
   .tabs button.on { color: var(--lime); }
   .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 86px); transform: translateX(-50%) translateY(16px); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; font-weight: 600; opacity: 0; transition: .25s; pointer-events: none; white-space: nowrap; z-index: 20; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Bottom sheet */
+  .backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, .6); z-index: 30; display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto; background: var(--card); border: 1px solid var(--card-line); border-bottom: none; border-radius: 28px 28px 0 0; padding: 10px 16px calc(env(safe-area-inset-bottom) + 20px); animation: up .22s ease-out; }
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
+  .grab { width: 40px; height: 5px; border-radius: 99px; background: var(--line); margin: 0 auto 12px; }
+  .sheethead { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+  .sheethead b { display: block; font-size: 20px; font-weight: 700; margin-top: 2px; }
+  .btn2 { width: 100%; height: 52px; border-radius: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+  .btn2.danger { color: var(--danger); }
+
+  /* Pomodoro */
+  .pomo { position: fixed; inset: 0; z-index: 40; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 24px; text-align: center; }
+  .ring { position: relative; width: 270px; height: 270px; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { transition: stroke-dashoffset .25s linear; }
+  .ring .time { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; font-weight: 800; letter-spacing: -.03em; }
+  .pomo .row { display: flex; gap: 10px; width: 100%; max-width: 360px; }
+  .pomo .row button { flex: 1; height: 56px; border-radius: 16px; font-size: 16px; font-weight: 700; }
+  .pomo .row button.go { background: var(--lime); color: var(--on-lime); border: none; }
 </style>
 </head>
 <body>
@@ -184,18 +204,12 @@
   </div>
 
   <div class="card">
-    <div class="label" id="detailDate"></div>
-    <div style="height:10px"></div>
-    <div id="detail"></div>
-  </div>
-
-  <div class="card">
-    <div class="label">Thêm tick</div>
-    <div style="font-size:14px;margin-top:4px" id="nextInfo"></div>
-    <div class="chips" id="chips"></div>
-    <input type="text" class="note" id="note" placeholder="Lý do: đọc xong chương 3" maxlength="200">
-    <button class="tickbtn" id="tickBtn"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Tick</button>
-    <div class="err" id="err"></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="ico" style="background:#FF9F6B26;color:var(--debt)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></div>
+      <div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:700">Pomodoro 25 phút</div><div class="sub" id="pomoInfo"></div></div>
+    </div>
+    <div class="chips" id="pomoChips"></div>
+    <button class="tickbtn" id="pomoStart"><svg class="i" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg>Bắt đầu tập trung</button>
   </div>
 </section>
 
@@ -252,6 +266,28 @@
   <button data-view="stats"><svg class="i" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Thống kê</button>
   <button data-view="settings"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Cài đặt</button>
 </nav>
+
+<div class="backdrop" id="sheetWrap" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grab"></div>
+    <div class="sheethead">
+      <div><span class="label" id="sheetRel"></span><b id="sheetTitle"></b></div>
+      <button class="del" id="sheetClose" aria-label="Đóng"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="pomo" id="pomo" hidden>
+  <div class="label" id="pomoAct" style="font-size:15px"></div>
+  <div class="ring">
+    <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--raised)" stroke-width="8"/><circle id="pomoArc" cx="60" cy="60" r="54" fill="none" stroke="var(--lime)" stroke-width="8" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="0"/></svg>
+    <div class="time" id="pomoTime">25:00</div>
+  </div>
+  <div class="sub" id="pomoSub" style="font-size:14px;max-width:320px;line-height:1.5"></div>
+  <div class="row" id="pomoRun"><button id="pomoCancel">Huỷ</button><button class="go" id="pomoPause">Tạm dừng</button></div>
+  <div class="row" id="pomoDone" hidden><button id="pomoClose">Đóng</button><button class="go" id="pomoAgain">Thêm 1 đợt</button></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -322,7 +358,8 @@ function save() {
 
 // Dates are local "YYYY-MM-DD" keys; day math goes through UTC to avoid DST drift.
 function pad(n) { return String(n).padStart(2, "0"); }
-function todayKey() { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function keyOf(ts) { const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function todayKey() { return keyOf(Date.now()); }
 function keyToUTC(k) { const [y, m, d] = k.split("-").map(Number); return Date.UTC(y, m - 1, d); }
 function addDays(k, n) { const d = new Date(keyToUTC(k) + n * 86400000); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`; }
 function daysBetween(a, b) { return Math.round((keyToUTC(b) - keyToUTC(a)) / 86400000); }
@@ -348,6 +385,8 @@ function boxState(k) {
   if (i === state.ticks.length) return "next";
   return k > todayKey() ? "future" : "empty";
 }
+function activeActs() { return state.activities.filter(a => !a.archived); }
+function isActive(id) { return activeActs().some(a => a.id === id); }
 function actById(id) { return state.activities.find(a => a.id === id) || { name: "(đã xoá)", icon: "star", color: "#7C8391" }; }
 function doneCount(k) { return state.ticks.reduce((s, t) => s + (t.done === k), 0); }
 function doneInLast(n) { const from = addDays(todayKey(), -(n - 1)); return state.ticks.filter(t => t.done >= from).length; }
@@ -408,7 +447,7 @@ function renderMonth(y, m) {
   }
   const body = document.getElementById("zoomBody");
   body.innerHTML = `<div class="month">${html}</div>`;
-  body.querySelectorAll("button.d").forEach(b => b.onclick = () => { selDate = b.dataset.k; renderMonth(y, m); renderDetail(); });
+  body.querySelectorAll("button.d").forEach(b => b.onclick = () => { openSheet(b.dataset.k); renderMonth(y, m); });
 }
 
 function renderYear(y) {
@@ -477,69 +516,193 @@ document.getElementById("next").onclick = () => {
   renderZoom();
 };
 
-/* ---------- Selected box ---------- */
-function renderDetail() {
-  const k = selDate;
-  const offset = daysBetween(todayKey(), k);
-  const rel = offset === 0 ? "Hôm nay · " : offset === -1 ? "Hôm qua · " : "";
-  document.getElementById("detailDate").textContent = `Ô ${rel}${weekday(k)}, ${fmtDate(k)}`;
-  const box = document.getElementById("detail");
-  const t = tickAt(k);
-  const st = boxState(k);
-  if (t) {
-    const a = actById(t.act);
-    box.innerHTML = `<div class="detail">
-      <div class="ico" style="background:${a.color}26;color:${a.color}">${svg(a.icon)}</div>
-      <div class="txt"><div class="name">${esc(a.name)}</div>
-        ${t.note ? `<div class="sub" style="color:var(--text)">${esc(t.note)}</div>` : ""}
-        <div class="sub">Làm ngày ${fmtDate(t.done)} · ô thứ ${fmtNum(boxIndex(k) + 1)}</div></div>
-      <button class="del" aria-label="Xoá tick"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`;
-    box.querySelector(".del").onclick = () => {
-      if (!confirm("Xoá tick này? Các tick ở những ô sau sẽ dồn lên 1 ô.")) return;
-      state.ticks.splice(boxIndex(k), 1);
-      save(); renderCal(); toast("Đã xoá tick");
-    };
-  } else if (st === "next") {
-    box.innerHTML = `<div class="sub" style="font-size:14px">Ô trống. Đây là ô tiếp theo sẽ được tick.</div>`;
-  } else if (st === "empty") {
-    box.innerHTML = `<div class="sub" style="font-size:14px">Ô còn nợ. Cần thêm ${fmtNum(boxIndex(k) - state.ticks.length + 1)} tick nữa để tới ô này.</div>`;
-  } else {
-    box.innerHTML = `<div class="sub" style="font-size:14px">Ngày tương lai. Chỉ được điền khi bạn đã trả hết nợ.</div>`;
-  }
+/* ---------- Day sheet: tap a box to act on it ---------- */
+function openSheet(k) {
+  selDate = k;
+  renderSheet();
+  document.getElementById("sheetWrap").hidden = false;
 }
+function closeSheet() { document.getElementById("sheetWrap").hidden = true; }
+document.getElementById("sheetClose").onclick = closeSheet;
+document.getElementById("sheetWrap").onclick = e => { if (e.target.id === "sheetWrap") closeSheet(); };
 
-/* ---------- Add tick ---------- */
-function renderAdd() {
-  document.getElementById("nextInfo").innerHTML = `Tick tiếp theo sẽ vào ô <b>${fmtDate(nextBox())}</b>`;
-  const chips = document.getElementById("chips");
-  chips.innerHTML = "";
-  for (const a of state.activities.filter(a => !a.archived)) {
+function renderChips(id, sel, onPick) {
+  const box = document.getElementById(id);
+  box.innerHTML = "";
+  for (const a of activeActs()) {
     const c = document.createElement("button");
-    const on = a.id === selAct;
+    const on = a.id === sel;
     c.className = "chip" + (on ? " on" : "");
     if (on) c.style.background = a.color;
     c.innerHTML = `<span style="color:${on ? "var(--on-lime)" : a.color};display:flex">${svg(a.icon)}</span>${esc(a.name)}`;
-    c.onclick = () => { selAct = a.id; document.getElementById("err").textContent = ""; renderAdd(); };
-    chips.appendChild(c);
+    c.onclick = () => { onPick(a.id); renderChips(id, a.id, onPick); };
+    box.appendChild(c);
   }
 }
 
-function addTick() {
-  const err = document.getElementById("err");
-  if (!selAct || !state.activities.some(a => a.id === selAct && !a.archived)) { err.textContent = "Chọn một hoạt động trước"; return; }
+function renderSheet() {
+  const k = selDate;
+  const offset = daysBetween(todayKey(), k);
+  const rel = offset === 0 ? "Hôm nay · " : offset === -1 ? "Hôm qua · " : "";
+  document.getElementById("sheetRel").textContent = `${rel}Ô thứ ${fmtNum(boxIndex(k) + 1)}`;
+  document.getElementById("sheetTitle").textContent = `${weekday(k)}, ${fmtDate(k)}`;
+  const body = document.getElementById("sheetBody");
+  const t = tickAt(k), st = boxState(k);
+  if (t) {
+    const a = actById(t.act);
+    body.innerHTML = `<div class="detail">
+        <div class="ico" style="background:${a.color}26;color:${a.color}">${svg(a.icon)}</div>
+        <div class="txt"><div class="name">${esc(a.name)}</div>
+          ${t.note ? `<div class="sub" style="color:var(--text)">${esc(t.note)}</div>` : ""}
+          <div class="sub">Làm ngày ${fmtDate(t.done)}</div></div></div>
+      <button class="btn2 danger" id="delTick"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Xoá tick này</button>`;
+    document.getElementById("delTick").onclick = () => {
+      if (!confirm("Xoá tick này? Các tick ở những ô sau sẽ dồn lên 1 ô.")) return;
+      state.ticks.splice(boxIndex(k), 1);
+      save(); closeSheet(); renderCal(); toast("Đã xoá tick");
+    };
+    return;
+  }
+  if (st === "future") {
+    body.innerHTML = `<div class="sub" style="font-size:14px">Ngày tương lai. Chỉ được điền khi bạn đã trả hết nợ.</div>`;
+    return;
+  }
+  const next = nextBox();
+  if (!isActive(selAct)) selAct = (activeActs()[0] || {}).id;
+  body.innerHTML = `<div class="sub" style="font-size:14px">${st === "next" ? "Ô trống tiếp theo." : `Ô còn nợ. Tick luôn vào ô trống cũ nhất: <b style="color:var(--text)">${fmtDate(next)}</b>.`}</div>
+    <div class="chips" id="sheetChips"></div>
+    <input type="text" class="note" id="note" placeholder="Lý do: đọc xong chương 3" maxlength="200">
+    <button class="tickbtn" id="tickBtn"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Tick ô ${fmtDate(next)}</button>
+    <div class="err" id="err"></div>
+    <button class="btn2" id="sheetPomo"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>Bắt đầu Pomodoro 25 phút</button>`;
+  renderChips("sheetChips", selAct, id => { selAct = id; document.getElementById("err").textContent = ""; });
+  document.getElementById("tickBtn").onclick = addTick;
+  document.getElementById("note").onkeydown = e => { if (e.key === "Enter") addTick(); };
+  document.getElementById("sheetPomo").onclick = () => {
+    if (!isActive(selAct)) { document.getElementById("err").textContent = "Chọn một hoạt động trước"; return; }
+    const note = document.getElementById("note").value.trim();
+    closeSheet();
+    startPomo(selAct, note);
+  };
+}
+
+// Ticks always land in the oldest empty box; jump the calendar there.
+function pushTick(act, note, done) {
   const box = nextBox();
-  const noteEl = document.getElementById("note");
-  state.ticks.push({ act: selAct, note: noteEl.value.trim(), done: todayKey(), t: Date.now() });
-  noteEl.value = "";
+  state.ticks.push({ act, note, done, t: Date.now() });
   save();
-  // Jump to where the tick landed.
   selDate = box; viewMonth = box.slice(0, 7); viewYear = Number(box.slice(0, 4));
-  renderCal();
+  if (currentView === "cal") renderCal();
+  return box;
+}
+
+function addTick() {
+  if (!isActive(selAct)) { document.getElementById("err").textContent = "Chọn một hoạt động trước"; return; }
+  const box = pushTick(selAct, document.getElementById("note").value.trim(), todayKey());
+  closeSheet();
   toast(`Đã tick ô ${fmtDate(box)}`);
   if (navigator.vibrate) navigator.vibrate(15);
 }
 
-function renderCal() { renderHeader(); renderZoom(); renderDetail(); renderAdd(); }
+/* ---------- Pomodoro: 25 focused minutes = 1 tick ---------- */
+// ?pomoSec=N shortens the timer for testing.
+const POMO_MS = (Number(new URLSearchParams(location.search).get("pomoSec")) || 25 * 60) * 1000;
+const ARC = 339.3;
+let pomoAct = null, pomoTimer = null, wakeLock = null, audioCtx = null, lastPomoAct = null;
+// state.pomo is { act, note, endAt } while running and { act, note, left } while paused, so it survives closing the app.
+
+function renderPomoCard() {
+  if (!isActive(pomoAct)) pomoAct = (activeActs()[0] || {}).id;
+  document.getElementById("pomoInfo").innerHTML = `Xong sẽ tự tick vào ô <b style="color:var(--text)">${fmtDate(nextBox())}</b>`;
+  renderChips("pomoChips", pomoAct, id => pomoAct = id);
+}
+
+function startPomo(act, note) {
+  if (!isActive(act)) { toast("Thêm một hoạt động trước"); return; }
+  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
+  state.pomo = { act, note, endAt: Date.now() + POMO_MS };
+  save();
+  showPomo();
+}
+
+function showPomo() {
+  document.getElementById("pomo").hidden = false;
+  document.getElementById("pomoRun").hidden = false;
+  document.getElementById("pomoDone").hidden = true;
+  document.getElementById("pomoAct").textContent = actById(state.pomo.act).name;
+  clearInterval(pomoTimer);
+  pomoTimer = setInterval(tickPomo, 250);
+  tickPomo();
+  if (state.pomo && state.pomo.endAt) requestWakeLock();
+}
+
+function tickPomo() {
+  const p = state.pomo;
+  if (!p) return;
+  const left = Math.max(0, p.endAt ? p.endAt - Date.now() : p.left);
+  const sec = Math.ceil(left / 1000);
+  document.getElementById("pomoTime").textContent = `${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`;
+  document.getElementById("pomoArc").style.strokeDashoffset = ARC * (1 - left / POMO_MS);
+  document.getElementById("pomoPause").textContent = p.endAt ? "Tạm dừng" : "Tiếp tục";
+  document.getElementById("pomoSub").innerHTML = p.endAt
+    ? `Đang tập trung. Xong sẽ tự tick vào ô <b style="color:var(--text)">${fmtDate(nextBox())}</b>.`
+    : "Đang tạm dừng.";
+  if (p.endAt && left <= 0) finishPomo();
+}
+
+function finishPomo() {
+  const p = state.pomo;
+  clearInterval(pomoTimer);
+  releaseWakeLock();
+  state.pomo = null;
+  lastPomoAct = p.act;
+  const box = pushTick(p.act, p.note || "Pomodoro 25 phút", keyOf(p.endAt));
+  document.getElementById("pomo").hidden = false;
+  document.getElementById("pomoAct").textContent = actById(p.act).name;
+  document.getElementById("pomoTime").textContent = "Xong";
+  document.getElementById("pomoArc").style.strokeDashoffset = 0;
+  document.getElementById("pomoSub").innerHTML = `Đã tick ô <b style="color:var(--text)">${fmtDate(box)}</b>. Nghỉ 5 phút rồi làm đợt tiếp nhé.`;
+  document.getElementById("pomoRun").hidden = true;
+  document.getElementById("pomoDone").hidden = false;
+  beep();
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+}
+
+function beep() {
+  if (!audioCtx) return;
+  try {
+    for (let i = 0; i < 3; i++) {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain(), at = audioCtx.currentTime + i * 0.35;
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(0.3, at + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.25);
+      o.connect(g).connect(audioCtx.destination);
+      o.start(at); o.stop(at + 0.3);
+    }
+  } catch (e) {}
+}
+
+async function requestWakeLock() { try { if (navigator.wakeLock && !wakeLock) wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
+function releaseWakeLock() { if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; } }
+
+document.getElementById("pomoStart").onclick = () => startPomo(pomoAct, "");
+document.getElementById("pomoPause").onclick = () => {
+  const p = state.pomo;
+  if (p.endAt) { state.pomo = { act: p.act, note: p.note, left: p.endAt - Date.now() }; releaseWakeLock(); }
+  else { state.pomo = { act: p.act, note: p.note, endAt: Date.now() + p.left }; requestWakeLock(); }
+  save(); tickPomo();
+};
+document.getElementById("pomoCancel").onclick = () => {
+  if (!confirm("Huỷ đợt này? Đợt bị huỷ sẽ không được tick.")) return;
+  state.pomo = null; save();
+  clearInterval(pomoTimer); releaseWakeLock();
+  document.getElementById("pomo").hidden = true;
+};
+document.getElementById("pomoClose").onclick = () => { document.getElementById("pomo").hidden = true; };
+document.getElementById("pomoAgain").onclick = () => startPomo(lastPomoAct, "");
+
+function renderCal() { renderHeader(); renderZoom(); renderPomoCard(); }
 
 /* ---------- Stats (by the real day each tick was done) ---------- */
 function streaks() {
@@ -639,8 +802,6 @@ function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<"
 let toastTimer;
 function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 1800); }
 
-document.getElementById("tickBtn").onclick = addTick;
-document.getElementById("note").onkeydown = e => { if (e.key === "Enter") addTick(); };
 document.getElementById("addAct").onclick = () => {
   const name = document.getElementById("newName").value.trim();
   if (!name) return;
@@ -684,13 +845,19 @@ function checkRollover() {
   lastToday = t;
   show(currentView);
 }
-document.addEventListener("visibilitychange", () => { if (!document.hidden) checkRollover(); });
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  checkRollover();
+  // Timers stall in the background; catch up (and award the tick) as soon as the app is back.
+  if (state.pomo) { tickPomo(); if (state.pomo && state.pomo.endAt) { wakeLock = null; requestWakeLock(); } }
+});
 setInterval(checkRollover, 60000);
 
 save(); // persist migrated data
 resetView();
 setZoom("month");
 show("cal");
+if (state.pomo) showPomo();
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("sw.js");
