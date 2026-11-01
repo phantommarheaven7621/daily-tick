@@ -59,7 +59,7 @@
   button:active { transform: scale(.96); }
   button:disabled { opacity: .35; }
   input[type=text], input[type=date], input[type=month] { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; min-width: 0; }
-  .view[hidden] { display: none; }
+  [hidden] { display: none !important; }
 
   /* Calendar */
   .summary { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
@@ -67,8 +67,11 @@
   .summary .debt { color: var(--danger); font-weight: 600; font-size: 14px; }
   .monthbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .monthbar button.nav { width: 40px; height: 40px; font-size: 20px; }
-  .monthbar .title { position: relative; font-weight: 700; font-size: 17px; background: none; border: none; padding: 8px 12px; }
-  .monthbar .title input { position: absolute; inset: 0; opacity: 0; width: 100%; }
+  .monthbar .title { font-weight: 700; font-size: 17px; background: none; border: none; padding: 8px 12px; }
+  .picker .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
+  .picker .grid button { padding: 10px 0; font-size: 15px; }
+  .picker .grid button.on { background: var(--accent); color: #fff; border-color: transparent; font-weight: 600; }
+  .picker .label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
   .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
   .cal .wd { text-align: center; font-size: 12px; color: var(--muted); padding-bottom: 2px; }
   .cal .d { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; position: relative; font-size: 15px; }
@@ -137,8 +140,14 @@
   <div class="card">
     <div class="monthbar">
       <button class="nav" id="prevMonth" aria-label="Tháng trước">‹</button>
-      <label class="title"><span id="monthTitle"></span> ▾<input type="month" id="monthPick" aria-label="Chọn tháng"></label>
+      <button class="title" id="monthTitleBtn" aria-label="Chọn tháng"><span id="monthTitle"></span> <span id="caret">▾</span></button>
       <button class="nav" id="nextMonth" aria-label="Tháng sau">›</button>
+    </div>
+    <div class="picker" id="picker" hidden>
+      <div class="label">Năm</div>
+      <div class="grid" id="pickYears"></div>
+      <div class="label">Tháng</div>
+      <div class="grid" id="pickMonths"></div>
     </div>
     <div class="cal" id="cal"></div>
     <div class="jump"><button id="goToday">Về hôm nay</button></div>
@@ -283,7 +292,6 @@ function renderCalendar() {
   const today = todayKey();
   const [y, m] = viewMonth.split("-").map(Number);
   document.getElementById("monthTitle").textContent = `Tháng ${m}, ${y}`;
-  document.getElementById("monthPick").value = viewMonth;
   document.getElementById("prevMonth").disabled = viewMonth <= state.start.slice(0, 7);
   document.getElementById("nextMonth").disabled = viewMonth >= today.slice(0, 7);
 
@@ -444,13 +452,39 @@ function toast(msg) { const t = document.getElementById("toast"); t.textContent 
 
 document.getElementById("prevMonth").onclick = () => { viewMonth = addMonths(viewMonth, -1); renderCalendar(); };
 document.getElementById("nextMonth").onclick = () => { viewMonth = addMonths(viewMonth, 1); renderCalendar(); };
-document.getElementById("monthPick").onchange = e => {
-  const v = e.target.value;
-  if (!v) return;
-  viewMonth = v < state.start.slice(0, 7) ? state.start.slice(0, 7) : v > todayKey().slice(0, 7) ? todayKey().slice(0, 7) : v;
-  renderCalendar();
-};
-document.getElementById("goToday").onclick = () => { selDate = todayKey(); viewMonth = selDate.slice(0, 7); renderAllCal(); };
+// Custom year/month picker: native month inputs show every year, this one only spans start..today.
+let pickYear = null;
+function setPicker(open) {
+  document.getElementById("picker").hidden = !open;
+  document.getElementById("cal").hidden = open;
+  document.getElementById("caret").textContent = open ? "▴" : "▾";
+  if (open) { pickYear = Number(viewMonth.slice(0, 4)); renderPicker(); }
+}
+function renderPicker() {
+  const minYM = state.start.slice(0, 7), maxYM = todayKey().slice(0, 7);
+  const years = document.getElementById("pickYears");
+  years.innerHTML = "";
+  for (let y = Number(maxYM.slice(0, 4)); y >= Number(minYM.slice(0, 4)); y--) {
+    const b = document.createElement("button");
+    b.textContent = y;
+    if (y === pickYear) b.className = "on";
+    b.onclick = () => { pickYear = y; renderPicker(); };
+    years.appendChild(b);
+  }
+  const months = document.getElementById("pickMonths");
+  months.innerHTML = "";
+  for (let m = 1; m <= 12; m++) {
+    const ym = `${pickYear}-${pad(m)}`;
+    const b = document.createElement("button");
+    b.textContent = `Th ${m}`;
+    if (ym === viewMonth) b.className = "on";
+    b.disabled = ym < minYM || ym > maxYM;
+    b.onclick = () => { viewMonth = ym; setPicker(false); renderCalendar(); };
+    months.appendChild(b);
+  }
+}
+document.getElementById("monthTitleBtn").onclick = () => setPicker(document.getElementById("picker").hidden);
+document.getElementById("goToday").onclick = () => { setPicker(false); selDate = todayKey(); viewMonth = selDate.slice(0, 7); renderAllCal(); };
 document.getElementById("addTick").onclick = addTick;
 document.getElementById("note").onkeydown = e => { if (e.key === "Enter") addTick(); };
 
