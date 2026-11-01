@@ -23,7 +23,9 @@
     --accent-soft: #dcfce7;
     --danger: #dc2626;
     --danger-soft: #fee2e2;
-    --bar: #86efac;
+    --l1: #bbf7d0;
+    --l2: #4ade80;
+    --l3: #16a34a;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -36,154 +38,180 @@
       --accent-soft: #14301f;
       --danger: #f87171;
       --danger-soft: #3a1a1a;
-      --bar: #166534;
+      --l1: #14532d;
+      --l2: #15803d;
+      --l3: #22c55e;
     }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--text); }
   body {
     font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 32px);
+    padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 90px);
     max-width: 560px; margin: 0 auto;
   }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
-  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; font-weight: 600; }
+  h1 { font-size: 24px; margin: 0 0 14px; }
+  h3 { font-size: 14px; margin: 0 0 6px; }
   .muted { color: var(--muted); }
   .num { font-variant-numeric: tabular-nums; }
-
-  /* Hero */
-  .hero .day { font-size: 44px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
-  .hero .since { color: var(--muted); font-size: 14px; margin-top: 2px; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
-  .stat { background: var(--bg); border-radius: 12px; padding: 10px; }
-  .stat .label { font-size: 12px; color: var(--muted); }
-  .stat .value { font-size: 20px; font-weight: 700; }
-  .stat.debt .value { color: var(--danger); }
-  .stat.ahead .value { color: var(--accent); }
-  .progress { height: 10px; background: var(--bg); border-radius: 99px; overflow: hidden; margin-top: 14px; }
-  .progress > div { height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
-  .pace { margin-top: 12px; font-size: 14px; }
-  .pill { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 13px; font-weight: 600; }
-  .pill.good { background: var(--accent-soft); color: var(--accent); }
-  .pill.bad { background: var(--danger-soft); color: var(--danger); }
-
-  /* Log */
-  .datebar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .datebar button { width: 40px; height: 40px; }
-  .datebar .label { font-weight: 700; text-align: center; }
-  .datebar .label small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
-  .daytotal { text-align: center; font-size: 14px; margin-bottom: 12px; }
-  .act { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
-  .act:first-of-type { border-top: none; }
-  .act .main { flex: 1; display: flex; align-items: center; gap: 10px; background: none; border: none; color: inherit; font: inherit; text-align: left; padding: 6px 0; cursor: pointer; }
-  .act .emoji { font-size: 24px; width: 32px; text-align: center; }
-  .act .count { min-width: 28px; text-align: center; font-weight: 700; color: var(--muted); }
-  .act .count.on { color: var(--accent); }
   button { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
   button:active { transform: scale(.96); }
-  .round { width: 44px; height: 44px; border-radius: 12px; font-size: 22px; line-height: 1; display: grid; place-items: center; }
-  .round.plus { background: var(--accent); color: #fff; border-color: transparent; }
-  .round:disabled { opacity: .35; }
+  button:disabled { opacity: .35; }
+  input[type=text], input[type=date], input[type=month] { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; min-width: 0; }
+  .view[hidden] { display: none; }
 
-  /* Chart */
-  .chart { display: flex; align-items: flex-end; gap: 4px; height: 120px; position: relative; padding-top: 8px; }
-  .chart .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
-  .chart .bar { width: 100%; background: var(--bar); border-radius: 4px 4px 0 0; min-height: 2px; position: relative; }
-  .chart .bar.zero { background: var(--danger-soft); }
-  .chart .v { position: absolute; bottom: 100%; left: 0; right: 0; text-align: center; font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-  .chart .goal { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--danger); opacity: .7; }
-  .xlabels { display: flex; gap: 4px; margin-top: 4px; }
-  .xlabels span { flex: 1; text-align: center; font-size: 10px; color: var(--muted); }
+  /* Calendar */
+  .summary { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .summary .day { font-size: 22px; font-weight: 800; }
+  .summary .debt { color: var(--danger); font-weight: 600; font-size: 14px; }
+  .monthbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .monthbar button.nav { width: 40px; height: 40px; font-size: 20px; }
+  .monthbar .title { position: relative; font-weight: 700; font-size: 17px; background: none; border: none; padding: 8px 12px; }
+  .monthbar .title input { position: absolute; inset: 0; opacity: 0; width: 100%; }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .cal .wd { text-align: center; font-size: 12px; color: var(--muted); padding-bottom: 2px; }
+  .cal .d { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; position: relative; font-size: 15px; }
+  .cal .d small { font-size: 10px; font-weight: 700; line-height: 1; margin-top: 1px; }
+  .cal .d.l1 { background: var(--l1); border-color: transparent; }
+  .cal .d.l2 { background: var(--l2); border-color: transparent; color: #052e16; }
+  .cal .d.l3 { background: var(--l3); border-color: transparent; color: #fff; }
+  .cal .d.today { outline: 2px solid var(--text); outline-offset: 1px; }
+  .cal .d.sel { box-shadow: 0 0 0 3px var(--accent); }
+  .cal .d:disabled { background: transparent; border-style: dashed; opacity: .3; }
+  .jump { display: flex; justify-content: center; margin-top: 10px; }
+  .jump button { padding: 6px 12px; font-size: 13px; }
+
+  /* Day panel */
+  .dayhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .dayhead b { font-size: 16px; }
+  .entry { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .entry .emoji { font-size: 20px; width: 28px; text-align: center; }
+  .entry .txt { flex: 1; min-width: 0; }
+  .entry .txt div:last-child { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+  .entry button { width: 34px; height: 34px; color: var(--danger); }
+  .empty { color: var(--muted); font-size: 14px; padding: 6px 0 10px; }
+  .addbox { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .chip { padding: 8px 12px; border-radius: 99px; font-size: 14px; }
+  .chip.on { background: var(--accent); color: #fff; border-color: transparent; }
+  .addrow { display: flex; gap: 8px; }
+  .addrow input { flex: 1; }
+  .btn { padding: 10px 14px; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: transparent; font-weight: 600; }
+  .btn.danger { color: var(--danger); }
+  .err { color: var(--danger); font-size: 13px; margin-top: 6px; min-height: 1em; }
+
+  /* Stats */
+  .kgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .k { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  .k .label { font-size: 13px; color: var(--muted); }
+  .k .value { font-size: 24px; font-weight: 700; margin-top: 2px; }
+  .k .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .k.wide { grid-column: 1 / -1; }
+  .k.bad .value { color: var(--danger); }
+  .k.good .value { color: var(--accent); }
 
   /* Settings */
-  details summary { cursor: pointer; font-weight: 600; list-style: none; }
-  details summary::-webkit-details-marker { display: none; }
-  details summary::after { content: "›"; float: right; transition: transform .2s; color: var(--muted); }
-  details[open] summary::after { transform: rotate(90deg); }
   .edit-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
-  input[type=text], input[type=date] { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; min-width: 0; }
   .edit-row .e { width: 52px; text-align: center; }
   .edit-row .n { flex: 1; }
-  .btn { padding: 10px 14px; }
-  .btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
-  .btn.danger { color: var(--danger); }
-  .section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
-  .section h3 { font-size: 14px; margin: 0 0 6px; }
   .row-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 24px); transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; opacity: 0; transition: .25s; pointer-events: none; white-space: nowrap; }
+
+  /* Tab bar */
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
+  .tabs button { flex: 1; max-width: 186px; border: none; background: none; border-radius: 0; padding: 10px 0 8px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tabs button span { font-size: 20px; line-height: 1; }
+  .tabs button.on { color: var(--accent); font-weight: 600; }
+  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 80px); transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; opacity: 0; transition: .25s; pointer-events: none; white-space: nowrap; z-index: 20; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<div class="card hero">
-  <div class="day num" id="dayNum">—</div>
-  <div class="since" id="since"></div>
-  <div class="stats">
-    <div class="stat"><div class="label">Cần có</div><div class="value num" id="required">—</div></div>
-    <div class="stat"><div class="label">Đã tick</div><div class="value num" id="earned">—</div></div>
-    <div class="stat" id="gapBox"><div class="label" id="gapLabel">Còn nợ</div><div class="value num" id="gap">—</div></div>
+<section class="view" id="view-cal">
+  <div class="summary">
+    <div class="day num" id="dayNum"></div>
+    <div class="debt num" id="debt"></div>
   </div>
-  <div class="progress"><div id="progress"></div></div>
-  <div class="pace" id="pace"></div>
-</div>
-
-<div class="card">
-  <div class="datebar">
-    <button id="prevDay" aria-label="Ngày trước">‹</button>
-    <div class="label" id="dateLabel"></div>
-    <button id="nextDay" aria-label="Ngày sau">›</button>
+  <div class="card">
+    <div class="monthbar">
+      <button class="nav" id="prevMonth" aria-label="Tháng trước">‹</button>
+      <label class="title"><span id="monthTitle"></span> ▾<input type="month" id="monthPick" aria-label="Chọn tháng"></label>
+      <button class="nav" id="nextMonth" aria-label="Tháng sau">›</button>
+    </div>
+    <div class="cal" id="cal"></div>
+    <div class="jump"><button id="goToday">Về hôm nay</button></div>
   </div>
-  <div class="daytotal" id="dayTotal"></div>
-  <div id="acts"></div>
-</div>
 
-<div class="card">
-  <h2>14 ngày gần nhất</h2>
-  <div class="chart" id="chart"></div>
-  <div class="xlabels" id="xlabels"></div>
-  <div class="muted" style="font-size:12px;margin-top:8px">Đường đỏ = 1 tick/ngày, mức tối thiểu để khoảng cách không tăng thêm.</div>
-</div>
-
-<div class="card">
-  <details>
-    <summary>Cài đặt</summary>
-
-    <div class="section">
-      <h3>Hoạt động</h3>
-      <div class="muted" style="font-size:13px">Xoá một hoạt động sẽ ẩn nó đi, các tick cũ vẫn được giữ.</div>
-      <div id="editActs"></div>
-      <div class="edit-row">
-        <input type="text" class="e" id="newEmoji" placeholder="✨" maxlength="4">
-        <input type="text" class="n" id="newName" placeholder="Tên hoạt động mới">
-        <button class="btn primary" id="addAct">Thêm</button>
+  <div class="card">
+    <div class="dayhead"><b id="dayTitle"></b><span class="muted num" id="dayCount"></span></div>
+    <div id="entries"></div>
+    <div class="addbox">
+      <div class="chips" id="chips"></div>
+      <div class="addrow">
+        <input type="text" id="note" placeholder="Lý do: đọc xong chương 3" maxlength="200">
+        <button class="btn primary" id="addTick">Tick</button>
       </div>
+      <div class="err" id="err"></div>
     </div>
+  </div>
+</section>
 
-    <div class="section">
-      <h3>Ngày bắt đầu</h3>
-      <div class="edit-row">
-        <input type="date" id="startDate">
-      </div>
-    </div>
+<section class="view" id="view-stats" hidden>
+  <h1>Thống kê</h1>
+  <div class="kgrid">
+    <div class="k"><div class="label">Cần có</div><div class="value num" id="sRequired"></div><div class="sub" id="sSince"></div></div>
+    <div class="k good"><div class="label">Đã tick</div><div class="value num" id="sEarned"></div><div class="sub" id="sPct"></div></div>
+    <div class="k" id="sGapBox"><div class="label" id="sGapLabel">Còn nợ</div><div class="value num" id="sGap"></div><div class="sub" id="sToday"></div></div>
+    <div class="k"><div class="label">Chuỗi hiện tại</div><div class="value num" id="sStreak"></div><div class="sub" id="sStreakSub"></div></div>
+    <div class="k"><div class="label">TB 7 ngày</div><div class="value num" id="sAvg7"></div><div class="sub">tick/ngày</div></div>
+    <div class="k"><div class="label">TB 30 ngày</div><div class="value num" id="sAvg30"></div><div class="sub">tick/ngày</div></div>
+    <div class="k"><div class="label">Ngày nhiều nhất</div><div class="value num" id="sBest"></div><div class="sub" id="sBestDate"></div></div>
+    <div class="k"><div class="label">Chuỗi dài nhất</div><div class="value num" id="sLongest"></div><div class="sub">ngày liên tiếp có tick</div></div>
+    <div class="k wide"><div class="label">Dự kiến trả hết nợ</div><div class="value" id="sEta"></div><div class="sub" id="sEtaSub"></div></div>
+  </div>
+</section>
 
-    <div class="section">
-      <h3>Sao lưu</h3>
-      <div class="muted" style="font-size:13px">Dữ liệu chỉ nằm trên máy này. Thỉnh thoảng nên xuất file để sao lưu.</div>
-      <div class="row-btns">
-        <button class="btn" id="exportBtn">Xuất file</button>
-        <button class="btn" id="importBtn">Nhập file</button>
-        <input type="file" id="importFile" accept="application/json" hidden>
-      </div>
+<section class="view" id="view-settings" hidden>
+  <h1>Cài đặt</h1>
+  <div class="card">
+    <h3>Hoạt động</h3>
+    <div class="muted" style="font-size:13px">Xoá một hoạt động sẽ ẩn nó đi, các tick cũ vẫn được giữ.</div>
+    <div id="editActs"></div>
+    <div class="edit-row">
+      <input type="text" class="e" id="newEmoji" placeholder="✨" maxlength="4">
+      <input type="text" class="n" id="newName" placeholder="Tên hoạt động mới">
+      <button class="btn primary" id="addAct">Thêm</button>
     </div>
-  </details>
-</div>
+  </div>
+  <div class="card">
+    <h3>Ngày bắt đầu</h3>
+    <input type="date" id="startDate">
+  </div>
+  <div class="card">
+    <h3>Sao lưu</h3>
+    <div class="muted" style="font-size:13px">Dữ liệu chỉ nằm trên máy này. Thỉnh thoảng nên xuất file để sao lưu.</div>
+    <div class="row-btns">
+      <button class="btn" id="exportBtn">Xuất file</button>
+      <button class="btn" id="importBtn">Nhập file</button>
+      <input type="file" id="importFile" accept="application/json" hidden>
+    </div>
+  </div>
+</section>
+
+<nav class="tabs">
+  <button data-view="cal" class="on"><span>📅</span>Lịch</button>
+  <button data-view="stats"><span>📊</span>Thống kê</button>
+  <button data-view="settings"><span>⚙️</span>Cài đặt</button>
+</nav>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const STORAGE_KEY = "daily-tick-v1";
 const DEFAULT_STATE = {
+  version: 2,
   start: "1996-02-26",
   activities: [
     { id: "study", emoji: "📚", name: "Học 25 phút" },
@@ -191,11 +219,13 @@ const DEFAULT_STATE = {
     { id: "exercise", emoji: "🏃", name: "Tập thể dục 25 phút" },
     { id: "other", emoji: "✨", name: "Việc có ích khác" },
   ],
-  log: {}, // { "YYYY-MM-DD": { activityId: count } }
+  log: {}, // { "YYYY-MM-DD": [ { act, note, t } ] }
 };
 
-let state = load();
-let viewDate = todayKey();
+let state = migrate(load());
+let selDate = todayKey();
+let viewMonth = selDate.slice(0, 7);
+let selAct = null;
 
 function load() {
   try {
@@ -203,6 +233,18 @@ function load() {
     if (raw) return JSON.parse(raw);
   } catch (e) {}
   return structuredClone(DEFAULT_STATE);
+}
+// v1 stored { date: { activityId: count } }; v2 stores a list of ticks with a reason per day.
+function migrate(s) {
+  if (s.version === 2) return s;
+  const log = {};
+  for (const [k, day] of Object.entries(s.log || {})) {
+    if (Array.isArray(day)) { log[k] = day; continue; }
+    const list = [];
+    for (const [act, n] of Object.entries(day)) for (let i = 0; i < n; i++) list.push({ act, note: "", t: 0 });
+    if (list.length) log[k] = list;
+  }
+  return { ...s, version: 2, log };
 }
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -215,110 +257,152 @@ function todayKey() { const d = new Date(); return `${d.getFullYear()}-${pad(d.g
 function keyToUTC(k) { const [y, m, d] = k.split("-").map(Number); return Date.UTC(y, m - 1, d); }
 function addDays(k, n) { const d = new Date(keyToUTC(k) + n * 86400000); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`; }
 function daysBetween(a, b) { return Math.round((keyToUTC(b) - keyToUTC(a)) / 86400000); }
+function addMonths(ym, n) { let [y, m] = ym.split("-").map(Number); m += n; y += Math.floor((m - 1) / 12); m = ((m - 1) % 12 + 12) % 12 + 1; return `${y}-${pad(m)}`; }
 function fmtDate(k) { const [y, m, d] = k.split("-"); return `${d}/${m}/${y}`; }
 function fmtNum(n) { return n.toLocaleString("vi-VN"); }
-const WEEKDAYS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+function fmtDec(n) { return n.toLocaleString("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+const WEEKDAYS = ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
 function weekday(k) { return WEEKDAYS[new Date(keyToUTC(k)).getUTCDay()]; }
 
-function dayTotal(k) { return Object.values(state.log[k] || {}).reduce((s, n) => s + n, 0); }
-function totalEarned() { return Object.keys(state.log).reduce((s, k) => s + dayTotal(k), 0); }
+function dayTotal(k) { return (state.log[k] || []).length; }
+function totalEarned() { return Object.values(state.log).reduce((s, l) => s + l.length, 0); }
 function ticksInLast(n) { let s = 0; const t = todayKey(); for (let i = 0; i < n; i++) s += dayTotal(addDays(t, -i)); return s; }
+function actById(id) { return state.activities.find(a => a.id === id) || { emoji: "•", name: "(đã xoá)" }; }
 
-function changeTick(actId, delta) {
-  const day = state.log[viewDate] || (state.log[viewDate] = {});
-  const next = Math.max(0, (day[actId] || 0) + delta);
-  if (next) day[actId] = next; else delete day[actId];
-  if (!Object.keys(day).length) delete state.log[viewDate];
-  save();
-  render();
-  if (delta > 0 && navigator.vibrate) navigator.vibrate(15);
+/* ---------- Calendar ---------- */
+function renderSummary() {
+  const required = daysBetween(state.start, todayKey());
+  const gap = required - totalEarned();
+  document.getElementById("dayNum").textContent = `Ngày ${fmtNum(required)}`;
+  const debt = document.getElementById("debt");
+  debt.textContent = gap > 0 ? `Nợ ${fmtNum(gap)}` : `Vượt ${fmtNum(-gap)}`;
+  debt.style.color = gap > 0 ? "" : "var(--accent)";
 }
 
-function renderHero() {
+function renderCalendar() {
+  const today = todayKey();
+  const [y, m] = viewMonth.split("-").map(Number);
+  document.getElementById("monthTitle").textContent = `Tháng ${m}, ${y}`;
+  document.getElementById("monthPick").value = viewMonth;
+  document.getElementById("prevMonth").disabled = viewMonth <= state.start.slice(0, 7);
+  document.getElementById("nextMonth").disabled = viewMonth >= today.slice(0, 7);
+
+  const first = `${viewMonth}-01`;
+  const lead = (new Date(keyToUTC(first)).getUTCDay() + 6) % 7; // Monday-first
+  const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  let html = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map(d => `<div class="wd">${d}</div>`).join("");
+  html += "<div></div>".repeat(lead);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const k = `${viewMonth}-${pad(d)}`;
+    const n = dayTotal(k);
+    const off = k < state.start || k > today;
+    const lvl = n >= 4 ? "l3" : n >= 2 ? "l2" : n >= 1 ? "l1" : "";
+    const cls = ["d", lvl, k === today ? "today" : "", k === selDate ? "sel" : ""].join(" ");
+    html += `<button class="${cls}" data-k="${k}" ${off ? "disabled" : ""}>${d}${n ? `<small>${n}</small>` : ""}</button>`;
+  }
+  const cal = document.getElementById("cal");
+  cal.innerHTML = html;
+  cal.querySelectorAll("button.d").forEach(b => b.onclick = () => { selDate = b.dataset.k; renderCalendar(); renderDay(); });
+}
+
+function renderDay() {
+  const list = state.log[selDate] || [];
+  const offset = daysBetween(todayKey(), selDate);
+  const rel = offset === 0 ? "Hôm nay · " : offset === -1 ? "Hôm qua · " : "";
+  document.getElementById("dayTitle").textContent = `${rel}${weekday(selDate)}, ${fmtDate(selDate)}`;
+  document.getElementById("dayCount").textContent = `${list.length} tick`;
+
+  const box = document.getElementById("entries");
+  box.innerHTML = list.length ? "" : `<div class="empty">Chưa có tick nào cho ngày này.</div>`;
+  list.forEach((e, i) => {
+    const a = actById(e.act);
+    const row = document.createElement("div");
+    row.className = "entry";
+    row.innerHTML = `<span class="emoji">${esc(a.emoji)}</span>
+      <div class="txt"><div>${esc(a.name)}</div>${e.note ? `<div>${esc(e.note)}</div>` : ""}</div>
+      <button aria-label="Xoá tick">✕</button>`;
+    row.querySelector("button").onclick = () => {
+      if (!confirm("Xoá tick này?")) return;
+      list.splice(i, 1);
+      if (!list.length) delete state.log[selDate];
+      save(); renderAllCal(); toast("Đã xoá tick");
+    };
+    box.appendChild(row);
+  });
+
+  const chips = document.getElementById("chips");
+  chips.innerHTML = "";
+  for (const a of state.activities.filter(a => !a.archived)) {
+    const c = document.createElement("button");
+    c.className = "chip" + (a.id === selAct ? " on" : "");
+    c.textContent = `${a.emoji} ${a.name}`;
+    c.onclick = () => { selAct = a.id; document.getElementById("err").textContent = ""; renderDay(); };
+    chips.appendChild(c);
+  }
+}
+
+function addTick() {
+  const err = document.getElementById("err");
+  if (!selAct || !state.activities.some(a => a.id === selAct && !a.archived)) { err.textContent = "Chọn một hoạt động trước"; return; }
+  const noteEl = document.getElementById("note");
+  (state.log[selDate] || (state.log[selDate] = [])).push({ act: selAct, note: noteEl.value.trim(), t: Date.now() });
+  noteEl.value = "";
+  selAct = null;
+  save(); renderAllCal(); toast("Đã tick ✓");
+  if (navigator.vibrate) navigator.vibrate(15);
+}
+
+function renderAllCal() { renderSummary(); renderCalendar(); renderDay(); }
+
+/* ---------- Stats ---------- */
+function streaks() {
+  const today = todayKey();
+  // Current streak counts back from today, or from yesterday if today has no tick yet.
+  let cur = 0, k = dayTotal(today) ? today : addDays(today, -1);
+  while (k >= state.start && dayTotal(k)) { cur++; k = addDays(k, -1); }
+  const days = Object.keys(state.log).filter(d => state.log[d].length).sort();
+  let longest = 0, run = 0, prev = null;
+  for (const d of days) { run = prev && daysBetween(prev, d) === 1 ? run + 1 : 1; longest = Math.max(longest, run); prev = d; }
+  return { cur, longest };
+}
+
+function renderStats() {
   const today = todayKey();
   const required = daysBetween(state.start, today);
   const earned = totalEarned();
   const gap = required - earned;
+  const todayN = dayTotal(today);
+  const avg7 = ticksInLast(7) / 7, avg30 = ticksInLast(30) / 30;
+  const { cur, longest } = streaks();
+  let best = 0, bestDate = null;
+  for (const [k, l] of Object.entries(state.log)) if (l.length > best) { best = l.length; bestDate = k; }
 
-  document.getElementById("dayNum").textContent = `Ngày ${fmtNum(required)}`;
-  document.getElementById("since").textContent = `kể từ ${fmtDate(state.start)}`;
-  document.getElementById("required").textContent = fmtNum(required);
-  document.getElementById("earned").textContent = fmtNum(earned);
-  document.getElementById("gap").textContent = fmtNum(Math.abs(gap));
-  document.getElementById("gapLabel").textContent = gap > 0 ? "Còn nợ" : "Vượt trước";
-  document.getElementById("gapBox").className = "stat " + (gap > 0 ? "debt" : "ahead");
-  document.getElementById("progress").style.width = Math.min(100, required ? earned / required * 100 : 100) + "%";
-
-  const todayTicks = dayTotal(today);
-  const net = todayTicks - 1;
-  const rate7 = ticksInLast(7) / 7;
-  const rate30 = ticksInLast(30) / 30;
-
-  let lines = [];
-  lines.push(net > 0
-    ? `Hôm nay <span class="pill good">+${todayTicks}</span> → khoảng cách giảm ${net}.`
-    : net === 0
-      ? `Hôm nay <span class="pill good">+1</span> → giữ được tốc độ, khoảng cách không tăng.`
-      : `Hôm nay chưa có tick nào <span class="pill bad">khoảng cách +1</span>`);
-  lines.push(`Trung bình 7 ngày: <b class="num">${rate7.toFixed(1)}</b>/ngày · 30 ngày: <b class="num">${rate30.toFixed(1)}</b>/ngày`);
-  if (gap > 0) {
-    if (rate30 > 1) {
-      const days = Math.ceil(gap / (rate30 - 1));
-      lines.push(`Với tốc độ 30 ngày, bạn sẽ đuổi kịp sau <b class="num">${fmtNum(days)}</b> ngày (khoảng ${fmtDate(addDays(today, days))}).`);
-    } else {
-      lines.push(`Cần trung bình <b>trên 1 tick/ngày</b> thì khoảng cách mới bắt đầu thu hẹp.`);
-    }
-  }
-  document.getElementById("pace").innerHTML = lines.map(l => `<div style="margin-top:4px">${l}</div>`).join("");
+  const set = (id, v) => document.getElementById(id).textContent = v;
+  set("sRequired", fmtNum(required));
+  set("sSince", `từ ${fmtDate(state.start)}`);
+  set("sEarned", fmtNum(earned));
+  set("sPct", `${fmtDec(required ? earned / required * 100 : 0)}% chặng đường`);
+  set("sGapLabel", gap > 0 ? "Còn nợ" : "Vượt trước");
+  set("sGap", fmtNum(Math.abs(gap)));
+  document.getElementById("sGapBox").className = "k " + (gap > 0 ? "bad" : "good");
+  set("sToday", todayN > 1 ? `hôm nay giảm ${todayN - 1}` : todayN === 1 ? "hôm nay giữ nguyên" : "hôm nay +1");
+  set("sStreak", `${cur} ngày`);
+  set("sStreakSub", dayTotal(today) ? "tính cả hôm nay" : "tick hôm nay để giữ chuỗi");
+  set("sAvg7", fmtDec(avg7));
+  set("sAvg30", fmtDec(avg30));
+  set("sBest", `${best} tick`);
+  set("sBestDate", bestDate ? fmtDate(bestDate) : "chưa có");
+  set("sLongest", `${longest} ngày`);
+  if (gap <= 0) { set("sEta", "Đã trả hết 🎉"); set("sEtaSub", "giữ trên 1 tick/ngày để tiếp tục vượt"); }
+  else if (avg30 > 1) {
+    const days = Math.ceil(gap / (avg30 - 1));
+    const [y, m] = addDays(today, days).split("-");
+    set("sEta", `Tháng ${Number(m)}, ${y}`);
+    set("sEtaSub", `sau ${fmtNum(days)} ngày nếu giữ ${fmtDec(avg30)} tick/ngày (TB 30 ngày)`);
+  } else { set("sEta", "Chưa đuổi kịp"); set("sEtaSub", "cần TB 30 ngày trên 1 tick/ngày thì nợ mới bắt đầu giảm"); }
 }
 
-function renderLog() {
-  const today = todayKey();
-  const offset = daysBetween(today, viewDate);
-  const label = offset === 0 ? "Hôm nay" : offset === -1 ? "Hôm qua" : `${weekday(viewDate)}, ${fmtDate(viewDate)}`;
-  document.getElementById("dateLabel").innerHTML = `${label}${offset >= -1 ? `<small>${weekday(viewDate)}, ${fmtDate(viewDate)}</small>` : ""}`;
-  document.getElementById("nextDay").disabled = offset >= 0;
-  document.getElementById("prevDay").disabled = viewDate <= state.start;
-
-  const total = dayTotal(viewDate);
-  document.getElementById("dayTotal").innerHTML = `<b class="num">${total}</b> tick ${total >= 1 ? "✅" : ""}`;
-
-  const day = state.log[viewDate] || {};
-  // Archived activities still show on days where they were logged, so their ticks can be undone.
-  const acts = state.activities.filter(a => !a.archived || day[a.id]);
-  const box = document.getElementById("acts");
-  box.innerHTML = "";
-  for (const a of acts) {
-    const c = day[a.id] || 0;
-    const row = document.createElement("div");
-    row.className = "act";
-    row.innerHTML = `
-      <button class="main"><span class="emoji">${esc(a.emoji)}</span><span>${esc(a.name)}</span></button>
-      <span class="count num ${c ? "on" : ""}">${c}</span>
-      <button class="round minus" ${c ? "" : "disabled"} aria-label="Bớt">−</button>
-      <button class="round plus" aria-label="Thêm">+</button>`;
-    row.querySelector(".main").onclick = () => changeTick(a.id, 1);
-    row.querySelector(".plus").onclick = () => changeTick(a.id, 1);
-    row.querySelector(".minus").onclick = () => changeTick(a.id, -1);
-    box.appendChild(row);
-  }
-}
-
-function renderChart() {
-  const today = todayKey();
-  const days = [];
-  for (let i = 13; i >= 0; i--) days.push(addDays(today, -i));
-  const vals = days.map(dayTotal);
-  const max = Math.max(2, ...vals) * 1.15; // headroom for value labels
-  const chart = document.getElementById("chart");
-  chart.innerHTML = `<div class="goal" style="bottom:${112 / max}px"></div>` +
-    days.map((k, i) => `
-      <div class="col">
-        <div class="bar ${vals[i] ? "" : "zero"}" style="height:${(vals[i] / max) * 100}%"><div class="v num">${vals[i] || ""}</div></div>
-      </div>`).join("");
-  document.getElementById("xlabels").innerHTML = days.map(k => `<span>${k.slice(8)}</span>`).join("");
-}
-
+/* ---------- Settings ---------- */
 function renderSettings() {
   const box = document.getElementById("editActs");
   box.innerHTML = "";
@@ -330,25 +414,45 @@ function renderSettings() {
       <input type="text" class="n" value="${esc(a.name)}">
       <button class="btn danger" aria-label="Xoá">✕</button>`;
     const [e, n] = row.querySelectorAll("input");
-    e.onchange = () => { a.emoji = e.value.trim() || "•"; save(); render(); };
-    n.onchange = () => { if (n.value.trim()) { a.name = n.value.trim(); save(); render(); } };
+    e.onchange = () => { a.emoji = e.value.trim() || "•"; save(); };
+    n.onchange = () => { if (n.value.trim()) { a.name = n.value.trim(); save(); } };
     row.querySelector("button").onclick = () => {
       if (!confirm(`Xoá "${a.name}"? Các tick cũ vẫn được giữ.`)) return;
-      a.archived = true; save(); render();
+      a.archived = true; if (selAct === a.id) selAct = null; save(); renderSettings();
     };
     box.appendChild(row);
   }
   document.getElementById("startDate").value = state.start;
 }
 
-function render() { renderHero(); renderLog(); renderChart(); renderSettings(); }
+/* ---------- Shell ---------- */
+let currentView = "cal";
+function show(view) {
+  currentView = view;
+  document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "view-" + view);
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.view === view));
+  if (view === "cal") renderAllCal();
+  if (view === "stats") renderStats();
+  if (view === "settings") renderSettings();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => show(b.dataset.view));
 
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 let toastTimer;
 function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 1800); }
 
-document.getElementById("prevDay").onclick = () => { viewDate = addDays(viewDate, -1); renderLog(); };
-document.getElementById("nextDay").onclick = () => { if (viewDate < todayKey()) { viewDate = addDays(viewDate, 1); renderLog(); } };
+document.getElementById("prevMonth").onclick = () => { viewMonth = addMonths(viewMonth, -1); renderCalendar(); };
+document.getElementById("nextMonth").onclick = () => { viewMonth = addMonths(viewMonth, 1); renderCalendar(); };
+document.getElementById("monthPick").onchange = e => {
+  const v = e.target.value;
+  if (!v) return;
+  viewMonth = v < state.start.slice(0, 7) ? state.start.slice(0, 7) : v > todayKey().slice(0, 7) ? todayKey().slice(0, 7) : v;
+  renderCalendar();
+};
+document.getElementById("goToday").onclick = () => { selDate = todayKey(); viewMonth = selDate.slice(0, 7); renderAllCal(); };
+document.getElementById("addTick").onclick = addTick;
+document.getElementById("note").onkeydown = e => { if (e.key === "Enter") addTick(); };
 
 document.getElementById("addAct").onclick = () => {
   const name = document.getElementById("newName").value.trim();
@@ -357,14 +461,12 @@ document.getElementById("addAct").onclick = () => {
   state.activities.push({ id: "a" + Date.now().toString(36), emoji, name });
   document.getElementById("newName").value = "";
   document.getElementById("newEmoji").value = "";
-  save(); render(); toast("Đã thêm hoạt động");
+  save(); renderSettings(); toast("Đã thêm hoạt động");
 };
-
 document.getElementById("startDate").onchange = e => {
   if (!e.target.value || e.target.value > todayKey()) return;
-  state.start = e.target.value; save(); render();
+  state.start = e.target.value; save(); toast("Đã đổi ngày bắt đầu");
 };
-
 document.getElementById("exportBtn").onclick = () => {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
@@ -381,7 +483,7 @@ document.getElementById("importFile").onchange = async e => {
     const data = JSON.parse(await file.text());
     if (!data.start || !Array.isArray(data.activities) || typeof data.log !== "object") throw 0;
     if (!confirm("Thay toàn bộ dữ liệu hiện tại bằng file này?")) return;
-    state = data; save(); render(); toast("Đã nhập dữ liệu");
+    state = migrate(data); save(); show(currentView); toast("Đã nhập dữ liệu");
   } catch (err) { toast("File không hợp lệ"); }
   e.target.value = "";
 };
@@ -390,12 +492,16 @@ document.getElementById("importFile").onchange = async e => {
 let lastToday = todayKey();
 function checkRollover() {
   const t = todayKey();
-  if (t !== lastToday) { if (viewDate === lastToday) viewDate = t; lastToday = t; render(); }
+  if (t === lastToday) return;
+  if (selDate === lastToday) { selDate = t; viewMonth = t.slice(0, 7); }
+  lastToday = t;
+  show(currentView);
 }
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkRollover(); });
 setInterval(checkRollover, 60000);
 
-render();
+save(); // persist migrated data
+show("cal");
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("sw.js");
