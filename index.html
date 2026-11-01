@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Daily Tick</title>
-<meta name="theme-color" content="#0f1115">
+<meta name="theme-color" content="#0F1115">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,196 +12,234 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f6f8;
-    --card: #ffffff;
-    --text: #15171c;
-    --muted: #6b7280;
-    --line: #e5e7eb;
-    --accent: #16a34a;
-    --accent-soft: #dcfce7;
-    --danger: #dc2626;
-    --danger-soft: #fee2e2;
-    --l1: #bbf7d0;
-    --l2: #4ade80;
-    --l3: #16a34a;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0f1115;
-      --card: #181b21;
-      --text: #f3f4f6;
-      --muted: #9ca3af;
-      --line: #2a2f38;
-      --accent: #22c55e;
-      --accent-soft: #14301f;
-      --danger: #f87171;
-      --danger-soft: #3a1a1a;
-      --l1: #14532d;
-      --l2: #15803d;
-      --l3: #22c55e;
-    }
+    --bg: #0F1115;
+    --card: #171A21;
+    --card-line: #252A34;
+    --raised: #1F232C;
+    --line: #2A2F3A;
+    --text: #F2F3F5;
+    --muted: #9AA1AD;
+    --faint: #7C8391;
+    --lime: #C8F169;
+    --on-lime: #10140A;
+    --debt: #FF9F6B;
+    --danger: #FF7A7A;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; background: var(--bg); color: var(--text); }
   body {
-    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    padding: calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 90px);
+    font: 16px/1.4 "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-variant-numeric: tabular-nums;
+    padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 96px);
     max-width: 560px; margin: 0 auto;
   }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
-  h1 { font-size: 24px; margin: 0 0 14px; }
-  h3 { font-size: 14px; margin: 0 0 6px; }
-  .muted { color: var(--muted); }
-  .num { font-variant-numeric: tabular-nums; }
-  button { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
-  button:active { transform: scale(.96); }
-  button:disabled { opacity: .35; }
-  input[type=text], input[type=date], input[type=month] { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px; min-width: 0; }
   [hidden] { display: none !important; }
+  button { font: inherit; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
+  button:active { transform: scale(.97); }
+  button:disabled { opacity: .3; cursor: default; }
+  input[type=text], input[type=date] { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 0 14px; height: 48px; min-width: 0; }
+  input::placeholder { color: var(--faint); }
+  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .card { background: var(--card); border: 1px solid var(--card-line); border-radius: 24px; padding: 16px; margin-bottom: 14px; }
+  .label { font-size: 13px; font-weight: 600; color: var(--muted); }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin: 0 0 16px; }
 
-  /* Calendar */
-  .summary { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
-  .summary .day { font-size: 22px; font-weight: 800; }
-  .summary .debt { color: var(--danger); font-weight: 600; font-size: 14px; }
-  .monthbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .monthbar button.nav { width: 40px; height: 40px; font-size: 20px; }
-  .monthbar .title { font-weight: 700; font-size: 17px; background: none; border: none; padding: 8px 12px; }
-  .picker .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
-  .picker .grid button { padding: 10px 0; font-size: 15px; }
-  .picker .grid button.on { background: var(--accent); color: #fff; border-color: transparent; font-weight: 600; }
-  .picker .label { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-  .cal .wd { text-align: center; font-size: 12px; color: var(--muted); padding-bottom: 2px; }
-  .cal .d { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; position: relative; font-size: 15px; }
-  .cal .d small { font-size: 10px; font-weight: 700; line-height: 1; margin-top: 1px; }
-  .cal .d.l1 { background: var(--l1); border-color: transparent; }
-  .cal .d.l2 { background: var(--l2); border-color: transparent; color: #052e16; }
-  .cal .d.l3 { background: var(--l3); border-color: transparent; color: #fff; }
-  .cal .d.today { outline: 2px solid var(--text); outline-offset: 1px; }
-  .cal .d.sel { box-shadow: 0 0 0 3px var(--accent); }
-  .cal .d:disabled { background: transparent; border-style: dashed; opacity: .3; }
-  .jump { display: flex; justify-content: center; margin-top: 10px; }
-  .jump button { padding: 6px 12px; font-size: 13px; }
+  /* Header */
+  .hero { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 4px; }
+  .hero .big { font-size: 52px; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .hero .right { text-align: right; padding-bottom: 4px; }
+  .hero .debt { font-size: 22px; font-weight: 700; color: var(--debt); }
+  .bar { height: 6px; border-radius: 99px; background: var(--raised); overflow: hidden; margin: 14px 4px 6px; }
+  .bar > div { height: 100%; background: var(--lime); border-radius: 99px; min-width: 2px; }
+  .paid { font-size: 13px; color: var(--muted); padding: 0 4px; margin-bottom: 18px; }
+  .paid b { color: var(--text); font-weight: 600; }
 
-  /* Day panel */
-  .dayhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-  .dayhead b { font-size: 16px; }
-  .entry { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); }
-  .entry .emoji { font-size: 20px; width: 28px; text-align: center; }
-  .entry .txt { flex: 1; min-width: 0; }
-  .entry .txt div:last-child { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
-  .entry button { width: 34px; height: 34px; color: var(--danger); }
-  .empty { color: var(--muted); font-size: 14px; padding: 6px 0 10px; }
-  .addbox { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .chip { padding: 8px 12px; border-radius: 99px; font-size: 14px; }
-  .chip.on { background: var(--accent); color: #fff; border-color: transparent; }
-  .addrow { display: flex; gap: 8px; }
-  .addrow input { flex: 1; }
-  .btn { padding: 10px 14px; }
-  .btn.primary { background: var(--accent); color: #fff; border-color: transparent; font-weight: 600; }
-  .btn.danger { color: var(--danger); }
-  .err { color: var(--danger); font-size: 13px; margin-top: 6px; min-height: 1em; }
+  /* Zoom segmented control */
+  .seg { display: flex; background: var(--raised); border-radius: 14px; padding: 4px; margin-bottom: 14px; }
+  .seg button { flex: 1; border: none; background: none; height: 36px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .seg button.on { background: var(--card); color: var(--text); box-shadow: 0 0 0 1px var(--line); }
+
+  .navbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .navbar .nav { width: 44px; height: 44px; display: grid; place-items: center; }
+  .navbar .title { border: none; background: none; display: flex; align-items: baseline; gap: 8px; padding: 8px 12px; border-radius: 12px; }
+  .navbar .title b { font-size: 20px; font-weight: 700; }
+  .navbar .title span { font-size: 16px; color: var(--muted); font-weight: 500; }
+
+  /* Month grid */
+  .month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  .month .wd { text-align: center; font-size: 12px; font-weight: 600; color: var(--faint); padding-bottom: 4px; }
+  .month .d { height: 46px; border-radius: 14px; padding: 0; font-size: 15px; font-weight: 600; border: 1px solid var(--line); background: var(--raised); color: var(--text); }
+  .month .d.filled { background: var(--lime); color: var(--on-lime); border-color: transparent; }
+  .month .d.next { background: transparent; border: 2px dashed var(--lime); color: var(--lime); }
+  .month .d.future { background: transparent; border-style: dashed; color: var(--faint); }
+  .month .d.today { outline: 2px solid var(--text); outline-offset: 2px; }
+  .month .d.sel { box-shadow: 0 0 0 3px #4E6A1C; }
+  .month .d.before { visibility: hidden; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: 12px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+  /* Year grid: 12 mini months */
+  .year { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .mini { background: none; border: 1px solid transparent; border-radius: 14px; padding: 8px 6px; text-align: left; }
+  .mini.cur { border-color: var(--line); background: var(--raised); }
+  .mini .mh { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .mini .mh b { font-size: 13px; font-weight: 700; }
+  .mini .mh span { font-size: 10px; color: var(--muted); }
+  .mini .mg { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .mini .mg i { aspect-ratio: 1; border-radius: 2px; background: var(--line); display: block; }
+  .mg i.f { background: var(--lime); }
+  .mg i.n { background: transparent; box-shadow: inset 0 0 0 1.5px var(--lime); }
+  .mg i.u { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+  .mg i.x { visibility: hidden; }
+
+  /* Multi-year: one row per year, one block per month */
+  .yrow { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; border-radius: 10px; padding: 5px 4px; }
+  .yrow.cur { background: var(--raised); }
+  .yrow .y { width: 40px; font-size: 13px; font-weight: 700; text-align: left; }
+  .yrow .yr { flex: 1; display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+  .yrow .yr i { height: 16px; border-radius: 4px; background: var(--line); display: block; position: relative; overflow: hidden; }
+  .yrow .yr i b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--lime); }
+  .yrow .yr i.u { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+  .yrow .yr i.x { visibility: hidden; }
+  .yrow .c { width: 58px; text-align: right; font-size: 11px; color: var(--muted); }
+  .yhead { display: flex; gap: 10px; padding: 0 4px 6px; font-size: 10px; color: var(--faint); }
+  .yhead div:nth-child(2) { flex: 1; display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; text-align: center; }
+
+  /* Box detail */
+  .detail { display: flex; align-items: center; gap: 12px; }
+  .ico { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; }
+  .detail .txt { flex: 1; min-width: 0; }
+  .detail .name { font-size: 16px; font-weight: 600; }
+  .sub { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+  .del { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: none; color: var(--faint); }
+
+  /* Add tick */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .chip { height: 44px; padding: 0 14px 0 10px; border-radius: 99px; display: inline-flex; align-items: center; gap: 8px; background: transparent; font-size: 14px; font-weight: 600; }
+  .chip.on { color: var(--on-lime); border-color: transparent; }
+  .note { width: 100%; margin-bottom: 12px; }
+  .tickbtn { width: 100%; height: 54px; border: none; border-radius: 16px; background: var(--lime); color: var(--on-lime); font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .err { color: var(--danger); font-size: 13px; min-height: 18px; margin-top: 6px; }
 
   /* Stats */
-  .kgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .k { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
-  .k .label { font-size: 13px; color: var(--muted); }
-  .k .value { font-size: 24px; font-weight: 700; margin-top: 2px; }
-  .k .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .kgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .k { background: var(--card); border: 1px solid var(--card-line); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .k .v { font-size: 30px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+  .k .v small { font-size: 15px; font-weight: 600; color: var(--muted); }
+  .k .s { font-size: 12px; color: var(--muted); }
   .k.wide { grid-column: 1 / -1; }
-  .k.bad .value { color: var(--danger); }
-  .k.good .value { color: var(--accent); }
+  .k .h { display: flex; align-items: center; gap: 6px; }
+  .hero-k .v { font-size: 46px; color: var(--debt); }
+  .pill { padding: 6px 10px; border-radius: 99px; background: #262F17; color: var(--lime); font-size: 12px; font-weight: 700; white-space: nowrap; }
 
   /* Settings */
-  .edit-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
-  .edit-row .e { width: 52px; text-align: center; }
-  .edit-row .n { flex: 1; }
-  .row-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .arow { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+  .arow .ico { width: 48px; height: 48px; border: none; }
+  .arow input { flex: 1; }
+  .btn { height: 48px; padding: 0 16px; font-weight: 600; }
+  .btn.primary { background: var(--lime); color: var(--on-lime); border-color: transparent; }
 
-  /* Tab bar */
-  .tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); z-index: 10; }
-  .tabs button { flex: 1; max-width: 186px; border: none; background: none; border-radius: 0; padding: 10px 0 8px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .tabs button span { font-size: 20px; line-height: 1; }
-  .tabs button.on { color: var(--accent); font-weight: 600; }
-  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 80px); transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; opacity: 0; transition: .25s; pointer-events: none; white-space: nowrap; z-index: 20; }
+  /* Tabs */
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; background: #13161C; border-top: 1px solid var(--card-line); padding: 8px 0 calc(env(safe-area-inset-bottom) + 8px); z-index: 10; }
+  .tabs button { flex: 1; max-width: 186px; border: none; background: none; border-radius: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--faint); padding: 4px 0; }
+  .tabs button svg.i { width: 24px; height: 24px; }
+  .tabs button.on { color: var(--lime); }
+  .toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 86px); transform: translateX(-50%) translateY(16px); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; font-weight: 600; opacity: 0; transition: .25s; pointer-events: none; white-space: nowrap; z-index: 20; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
 <section class="view" id="view-cal">
-  <div class="summary">
-    <div class="day num" id="dayNum"></div>
-    <div class="debt num" id="debt"></div>
+  <div class="hero">
+    <div><div class="label">Ngày thứ</div><div class="big" id="dayNum"></div></div>
+    <div class="right"><div class="label" id="debtLabel">Còn nợ</div><div class="debt" id="debt"></div></div>
   </div>
+  <div class="bar"><div id="bar"></div></div>
+  <div class="paid" id="paid"></div>
+
   <div class="card">
-    <div class="monthbar">
-      <button class="nav" id="prevMonth" aria-label="Tháng trước">‹</button>
-      <button class="title" id="monthTitleBtn" aria-label="Chọn tháng"><span id="monthTitle"></span> <span id="caret">▾</span></button>
-      <button class="nav" id="nextMonth" aria-label="Tháng sau">›</button>
+    <div class="seg">
+      <button data-zoom="month">Tháng</button>
+      <button data-zoom="year">Năm</button>
+      <button data-zoom="years">Nhiều năm</button>
     </div>
-    <div class="picker" id="picker" hidden>
-      <div class="label">Năm</div>
-      <div class="grid" id="pickYears"></div>
-      <div class="label">Tháng</div>
-      <div class="grid" id="pickMonths"></div>
+    <div class="navbar" id="navbar">
+      <button class="nav" id="prev" aria-label="Trước"><svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button class="title" id="title"></button>
+      <button class="nav" id="next" aria-label="Sau"><svg class="i" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
-    <div class="cal" id="cal"></div>
-    <div class="jump"><button id="goToday">Về hôm nay</button></div>
+    <div id="zoomBody"></div>
+    <div class="legend">
+      <span><i style="background:var(--lime)"></i>Đã tick</span>
+      <span><i style="border:2px dashed var(--lime)"></i>Ô tiếp theo</span>
+      <span><i style="background:var(--raised);border:1px solid var(--line)"></i>Còn nợ</span>
+    </div>
   </div>
 
   <div class="card">
-    <div class="dayhead"><b id="dayTitle"></b><span class="muted num" id="dayCount"></span></div>
-    <div id="entries"></div>
-    <div class="addbox">
-      <div class="chips" id="chips"></div>
-      <div class="addrow">
-        <input type="text" id="note" placeholder="Lý do: đọc xong chương 3" maxlength="200">
-        <button class="btn primary" id="addTick">Tick</button>
-      </div>
-      <div class="err" id="err"></div>
-    </div>
+    <div class="label" id="detailDate"></div>
+    <div style="height:10px"></div>
+    <div id="detail"></div>
+  </div>
+
+  <div class="card">
+    <div class="label">Thêm tick</div>
+    <div style="font-size:14px;margin-top:4px" id="nextInfo"></div>
+    <div class="chips" id="chips"></div>
+    <input type="text" class="note" id="note" placeholder="Lý do: đọc xong chương 3" maxlength="200">
+    <button class="tickbtn" id="tickBtn"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Tick</button>
+    <div class="err" id="err"></div>
   </div>
 </section>
 
 <section class="view" id="view-stats" hidden>
   <h1>Thống kê</h1>
   <div class="kgrid">
-    <div class="k"><div class="label">Cần có</div><div class="value num" id="sRequired"></div><div class="sub" id="sSince"></div></div>
-    <div class="k good"><div class="label">Đã tick</div><div class="value num" id="sEarned"></div><div class="sub" id="sPct"></div></div>
-    <div class="k" id="sGapBox"><div class="label" id="sGapLabel">Còn nợ</div><div class="value num" id="sGap"></div><div class="sub" id="sToday"></div></div>
-    <div class="k"><div class="label">Chuỗi hiện tại</div><div class="value num" id="sStreak"></div><div class="sub" id="sStreakSub"></div></div>
-    <div class="k"><div class="label">TB 7 ngày</div><div class="value num" id="sAvg7"></div><div class="sub">tick/ngày</div></div>
-    <div class="k"><div class="label">TB 30 ngày</div><div class="value num" id="sAvg30"></div><div class="sub">tick/ngày</div></div>
-    <div class="k"><div class="label">Ngày nhiều nhất</div><div class="value num" id="sBest"></div><div class="sub" id="sBestDate"></div></div>
-    <div class="k"><div class="label">Chuỗi dài nhất</div><div class="value num" id="sLongest"></div><div class="sub">ngày liên tiếp có tick</div></div>
-    <div class="k wide"><div class="label">Dự kiến trả hết nợ</div><div class="value" id="sEta"></div><div class="sub" id="sEtaSub"></div></div>
+    <div class="k wide hero-k">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div><div class="label" id="sGapLabel">Còn nợ</div><div class="v" id="sGap"></div></div>
+        <span class="pill" id="sTodayPill"></span>
+      </div>
+      <div class="bar" style="margin:8px 0 4px"><div id="sBar"></div></div>
+      <div class="s" style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span id="sEarned"></span><span id="sRequired" style="text-align:right"></span></div>
+    </div>
+    <div class="k wide"><div class="label">Đã trả tới</div><div class="v" id="sPaid" style="font-size:26px"></div><div class="s" id="sPaidSub"></div></div>
+    <div class="k"><div class="h" style="color:var(--lime)"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/></svg><span class="label">Chuỗi hiện tại</span></div><div class="v" id="sStreak"></div><div class="s" id="sStreakSub"></div></div>
+    <div class="k"><div class="h" style="color:#8AB4FF"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg><span class="label">Chuỗi dài nhất</span></div><div class="v" id="sLongest"></div><div class="s">ngày liên tiếp có tick</div></div>
+    <div class="k"><span class="label">TB 7 ngày</span><div class="v" id="sAvg7"></div><div class="s">tick/ngày</div></div>
+    <div class="k"><span class="label">TB 30 ngày</span><div class="v" id="sAvg30"></div><div class="s">tick/ngày</div></div>
+    <div class="k"><span class="label">Ngày nhiều nhất</span><div class="v" id="sBest"></div><div class="s" id="sBestDate"></div></div>
+    <div class="k"><span class="label">Hôm nay</span><div class="v" id="sToday"></div><div class="s" id="sTodaySub"></div></div>
+    <div class="k wide"><div class="h" style="color:var(--debt)"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg><span class="label">Dự kiến trả hết nợ</span></div><div class="v" id="sEta" style="font-size:26px"></div><div class="s" id="sEtaSub" style="font-size:13px;line-height:1.5"></div></div>
   </div>
 </section>
 
 <section class="view" id="view-settings" hidden>
   <h1>Cài đặt</h1>
   <div class="card">
-    <h3>Hoạt động</h3>
-    <div class="muted" style="font-size:13px">Xoá một hoạt động sẽ ẩn nó đi, các tick cũ vẫn được giữ.</div>
+    <div class="label">Hoạt động</div>
+    <div class="sub" style="margin-top:4px">Chạm vào icon để đổi icon, giữ lâu để đổi màu. Xoá một hoạt động chỉ ẩn nó đi, tick cũ vẫn giữ.</div>
     <div id="editActs"></div>
-    <div class="edit-row">
-      <input type="text" class="e" id="newEmoji" placeholder="✨" maxlength="4">
-      <input type="text" class="n" id="newName" placeholder="Tên hoạt động mới">
+    <div class="arow">
+      <input type="text" id="newName" placeholder="Tên hoạt động mới">
       <button class="btn primary" id="addAct">Thêm</button>
     </div>
   </div>
   <div class="card">
-    <h3>Ngày bắt đầu</h3>
+    <div class="label" style="margin-bottom:10px">Ngày bắt đầu</div>
     <input type="date" id="startDate">
   </div>
   <div class="card">
-    <h3>Sao lưu</h3>
-    <div class="muted" style="font-size:13px">Dữ liệu chỉ nằm trên máy này. Thỉnh thoảng nên xuất file để sao lưu.</div>
-    <div class="row-btns">
+    <div class="label">Sao lưu</div>
+    <div class="sub" style="margin-top:4px">Dữ liệu chỉ nằm trên máy này. Thỉnh thoảng nên xuất file để sao lưu.</div>
+    <div style="display:flex;gap:8px;margin-top:12px">
       <button class="btn" id="exportBtn">Xuất file</button>
       <button class="btn" id="importBtn">Nhập file</button>
       <input type="file" id="importFile" accept="application/json" hidden>
@@ -210,30 +248,47 @@
 </section>
 
 <nav class="tabs">
-  <button data-view="cal" class="on"><span>📅</span>Lịch</button>
-  <button data-view="stats"><span>📊</span>Thống kê</button>
-  <button data-view="settings"><span>⚙️</span>Cài đặt</button>
+  <button data-view="cal" class="on"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Lịch</button>
+  <button data-view="stats"><svg class="i" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Thống kê</button>
+  <button data-view="settings"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Cài đặt</button>
 </nav>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const STORAGE_KEY = "daily-tick-v1";
+const ICONS = {
+  book: '<path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2"/><path d="M19 17v4H6"/>',
+  moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  pulse: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  sparkle: '<path d="M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z"/>',
+  heart: '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+  leaf: '<path d="M5 19c0-8 6-14 15-14 0 9-6 15-14 15"/><path d="M5 19l7-7"/>',
+  pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  code: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  star: '<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
+};
+const ICON_KEYS = Object.keys(ICONS);
+const COLORS = ["#8AB4FF", "#B79CFF", "#FF9F6B", "#C8F169", "#FF7EB6", "#5EE6C8", "#FFD166"];
 const DEFAULT_STATE = {
-  version: 2,
+  version: 3,
   start: "1996-02-26",
   activities: [
-    { id: "study", emoji: "📚", name: "Học 25 phút" },
-    { id: "sleep", emoji: "🌙", name: "Tắt đèn lên giường trước 22h" },
-    { id: "exercise", emoji: "🏃", name: "Tập thể dục 25 phút" },
-    { id: "other", emoji: "✨", name: "Việc có ích khác" },
+    { id: "study", icon: "book", color: "#8AB4FF", name: "Học 25 phút" },
+    { id: "sleep", icon: "moon", color: "#B79CFF", name: "Tắt đèn lên giường trước 22h" },
+    { id: "exercise", icon: "pulse", color: "#FF9F6B", name: "Tập thể dục 25 phút" },
+    { id: "other", icon: "sparkle", color: "#C8F169", name: "Việc có ích khác" },
   ],
-  log: {}, // { "YYYY-MM-DD": [ { act, note, t } ] }
+  // Box i (the day start + i) holds ticks[i]; new ticks always fill the oldest empty box.
+  ticks: [], // [{ act, note, done: "YYYY-MM-DD" (the real day it was done), t }]
 };
 
 let state = migrate(load());
-let selDate = todayKey();
-let viewMonth = selDate.slice(0, 7);
+let zoom = "month";
+let selDate = null;
+let viewMonth = null;
+let viewYear = null;
 let selAct = null;
 
 function load() {
@@ -243,108 +298,228 @@ function load() {
   } catch (e) {}
   return structuredClone(DEFAULT_STATE);
 }
-// v1 stored { date: { activityId: count } }; v2 stores a list of ticks with a reason per day.
+// v1: log { date: { act: count } }, v2: log { date: [ {act, note, t} ] }, v3: one ordered ticks list.
 function migrate(s) {
-  if (s.version === 2) return s;
-  const log = {};
-  for (const [k, day] of Object.entries(s.log || {})) {
-    if (Array.isArray(day)) { log[k] = day; continue; }
-    const list = [];
-    for (const [act, n] of Object.entries(day)) for (let i = 0; i < n; i++) list.push({ act, note: "", t: 0 });
-    if (list.length) log[k] = list;
+  if (s.version === 3) return s;
+  const ticks = [];
+  for (const k of Object.keys(s.log || {}).sort()) {
+    const day = s.log[k];
+    const list = Array.isArray(day) ? day : Object.entries(day).flatMap(([act, n]) => Array(n).fill({ act, note: "", t: 0 }));
+    for (const e of list) ticks.push({ act: e.act, note: e.note || "", done: k, t: e.t || 0 });
   }
-  return { ...s, version: 2, log };
+  const legacyIcons = { study: "book", sleep: "moon", exercise: "pulse", other: "sparkle" };
+  const activities = (s.activities || DEFAULT_STATE.activities).map((a, i) => ({
+    id: a.id, name: a.name, archived: a.archived,
+    icon: a.icon || legacyIcons[a.id] || "star",
+    color: a.color || COLORS[i % COLORS.length],
+  }));
+  return { version: 3, start: s.start || DEFAULT_STATE.start, activities, ticks };
 }
 function save() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   catch (e) { toast("Không lưu được dữ liệu!"); }
 }
 
-// Dates are handled as local "YYYY-MM-DD" keys; day math goes through UTC to avoid DST drift.
+// Dates are local "YYYY-MM-DD" keys; day math goes through UTC to avoid DST drift.
 function pad(n) { return String(n).padStart(2, "0"); }
 function todayKey() { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
 function keyToUTC(k) { const [y, m, d] = k.split("-").map(Number); return Date.UTC(y, m - 1, d); }
 function addDays(k, n) { const d = new Date(keyToUTC(k) + n * 86400000); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`; }
 function daysBetween(a, b) { return Math.round((keyToUTC(b) - keyToUTC(a)) / 86400000); }
 function addMonths(ym, n) { let [y, m] = ym.split("-").map(Number); m += n; y += Math.floor((m - 1) / 12); m = ((m - 1) % 12 + 12) % 12 + 1; return `${y}-${pad(m)}`; }
+function daysInMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
 function fmtDate(k) { const [y, m, d] = k.split("-"); return `${d}/${m}/${y}`; }
 function fmtNum(n) { return n.toLocaleString("vi-VN"); }
 function fmtDec(n) { return n.toLocaleString("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
 const WEEKDAYS = ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
 function weekday(k) { return WEEKDAYS[new Date(keyToUTC(k)).getUTCDay()]; }
+function svg(key) { return `<svg class="i" viewBox="0 0 24 24">${ICONS[key] || ICONS.star}</svg>`; }
 
-function dayTotal(k) { return (state.log[k] || []).length; }
-function totalEarned() { return Object.values(state.log).reduce((s, l) => s + l.length, 0); }
-function ticksInLast(n) { let s = 0; const t = todayKey(); for (let i = 0; i < n; i++) s += dayTotal(addDays(t, -i)); return s; }
-function actById(id) { return state.activities.find(a => a.id === id) || { emoji: "•", name: "(đã xoá)" }; }
+function boxIndex(k) { return daysBetween(state.start, k); }
+function boxDate(i) { return addDays(state.start, i); }
+function tickAt(k) { const i = boxIndex(k); return i >= 0 && i < state.ticks.length ? state.ticks[i] : null; }
+function nextBox() { return boxDate(state.ticks.length); }
+// Last date the calendar reaches: today, or further when ticks run ahead of today.
+function lastDate() { const t = todayKey(), n = nextBox(); return n > t ? n : t; }
+function boxState(k) {
+  if (k < state.start) return "before";
+  const i = boxIndex(k);
+  if (i < state.ticks.length) return "filled";
+  if (i === state.ticks.length) return "next";
+  return k > todayKey() ? "future" : "empty";
+}
+function actById(id) { return state.activities.find(a => a.id === id) || { name: "(đã xoá)", icon: "star", color: "#7C8391" }; }
+function doneCount(k) { return state.ticks.reduce((s, t) => s + (t.done === k), 0); }
+function doneInLast(n) { const from = addDays(todayKey(), -(n - 1)); return state.ticks.filter(t => t.done >= from).length; }
 
-/* ---------- Calendar ---------- */
-function renderSummary() {
+/* ---------- Header ---------- */
+function renderHeader() {
   const required = daysBetween(state.start, todayKey());
-  const gap = required - totalEarned();
-  document.getElementById("dayNum").textContent = `Ngày ${fmtNum(required)}`;
+  const earned = state.ticks.length;
+  const gap = required - earned;
+  document.getElementById("dayNum").textContent = fmtNum(required);
+  document.getElementById("debtLabel").textContent = gap > 0 ? "Còn nợ" : "Vượt trước";
   const debt = document.getElementById("debt");
-  debt.textContent = gap > 0 ? `Nợ ${fmtNum(gap)}` : `Vượt ${fmtNum(-gap)}`;
-  debt.style.color = gap > 0 ? "" : "var(--accent)";
+  debt.textContent = fmtNum(Math.abs(gap));
+  debt.style.color = gap > 0 ? "" : "var(--lime)";
+  document.getElementById("bar").style.width = Math.min(100, earned / Math.max(1, required) * 100) + "%";
+  document.getElementById("paid").innerHTML = earned
+    ? `Đã trả tới <b>${fmtDate(boxDate(earned - 1))}</b> · ${fmtNum(earned)} ô`
+    : `Chưa có tick nào. Ô đầu tiên là <b>${fmtDate(state.start)}</b>`;
 }
 
-function renderCalendar() {
-  const today = todayKey();
-  const [y, m] = viewMonth.split("-").map(Number);
-  document.getElementById("monthTitle").textContent = `Tháng ${m}, ${y}`;
-  document.getElementById("prevMonth").disabled = viewMonth <= state.start.slice(0, 7);
-  document.getElementById("nextMonth").disabled = viewMonth >= today.slice(0, 7);
+/* ---------- Zoomable calendar: month → year → all years ---------- */
+function setZoom(z) {
+  zoom = z;
+  document.querySelectorAll(".seg button").forEach(b => b.classList.toggle("on", b.dataset.zoom === z));
+  renderZoom();
+}
 
-  const first = `${viewMonth}-01`;
-  const lead = (new Date(keyToUTC(first)).getUTCDay() + 6) % 7; // Monday-first
-  const daysInMonth = new Date(Date.UTC(y, m, 0)).getUTCDate();
+function renderZoom() {
+  const startY = Number(state.start.slice(0, 4)), endY = Number(lastDate().slice(0, 4));
+  const prev = document.getElementById("prev"), next = document.getElementById("next"), title = document.getElementById("title");
+  document.getElementById("navbar").hidden = zoom === "years";
+  if (zoom === "month") {
+    const [y, m] = viewMonth.split("-").map(Number);
+    title.innerHTML = `<b>Tháng ${m}</b><span>${y}</span>`;
+    prev.disabled = viewMonth <= state.start.slice(0, 7);
+    next.disabled = viewMonth >= lastDate().slice(0, 7);
+    renderMonth(y, m);
+  } else if (zoom === "year") {
+    title.innerHTML = `<b>Năm ${viewYear}</b>`;
+    prev.disabled = viewYear <= startY;
+    next.disabled = viewYear >= endY;
+    renderYear(viewYear);
+  } else {
+    renderYears(startY, endY);
+  }
+}
+
+function renderMonth(y, m) {
+  const today = todayKey();
+  const lead = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7; // Monday-first
   let html = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map(d => `<div class="wd">${d}</div>`).join("");
   html += "<div></div>".repeat(lead);
-  for (let d = 1; d <= daysInMonth; d++) {
-    const k = `${viewMonth}-${pad(d)}`;
-    const n = dayTotal(k);
-    const off = k < state.start || k > today;
-    const lvl = n >= 4 ? "l3" : n >= 2 ? "l2" : n >= 1 ? "l1" : "";
-    const cls = ["d", lvl, k === today ? "today" : "", k === selDate ? "sel" : ""].join(" ");
-    html += `<button class="${cls}" data-k="${k}" ${off ? "disabled" : ""}>${d}${n ? `<small>${n}</small>` : ""}</button>`;
+  for (let d = 1; d <= daysInMonth(y, m); d++) {
+    const k = `${y}-${pad(m)}-${pad(d)}`;
+    const st = boxState(k);
+    const cls = ["d", st, k === today ? "today" : "", k === selDate ? "sel" : ""].join(" ");
+    html += `<button class="${cls}" data-k="${k}" ${st === "before" ? "disabled" : ""}>${d}</button>`;
   }
-  const cal = document.getElementById("cal");
-  cal.innerHTML = html;
-  cal.querySelectorAll("button.d").forEach(b => b.onclick = () => { selDate = b.dataset.k; renderCalendar(); renderDay(); });
+  const body = document.getElementById("zoomBody");
+  body.innerHTML = `<div class="month">${html}</div>`;
+  body.querySelectorAll("button.d").forEach(b => b.onclick = () => { selDate = b.dataset.k; renderMonth(y, m); renderDetail(); });
 }
 
-function renderDay() {
-  const list = state.log[selDate] || [];
-  const offset = daysBetween(todayKey(), selDate);
+function renderYear(y) {
+  const curYM = todayKey().slice(0, 7), minYM = state.start.slice(0, 7), maxYM = lastDate().slice(0, 7);
+  const cls = { filled: "f", next: "n", future: "u", before: "x", empty: "" };
+  let html = "";
+  for (let m = 1; m <= 12; m++) {
+    const ym = `${y}-${pad(m)}`;
+    const lead = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
+    let cells = '<i class="x"></i>'.repeat(lead), filled = 0, total = 0;
+    for (let d = 1; d <= daysInMonth(y, m); d++) {
+      const st = boxState(`${ym}-${pad(d)}`);
+      if (st !== "before") total++;
+      if (st === "filled") filled++;
+      cells += `<i class="${cls[st]}"></i>`;
+    }
+    const off = ym < minYM || ym > maxYM;
+    html += `<button class="mini ${ym === curYM ? "cur" : ""}" data-ym="${ym}" ${off ? "disabled" : ""}>
+      <div class="mh"><b>Th ${m}</b><span>${off ? "" : `${filled}/${total}`}</span></div>
+      <div class="mg">${cells}</div></button>`;
+  }
+  const body = document.getElementById("zoomBody");
+  body.innerHTML = `<div class="year">${html}</div>`;
+  body.querySelectorAll("button.mini").forEach(b => b.onclick = () => { viewMonth = b.dataset.ym; setZoom("month"); });
+}
+
+function renderYears(startY, endY) {
+  const curY = Number(todayKey().slice(0, 4));
+  let html = `<div class="yhead"><div style="width:40px"></div><div>${[...Array(12)].map((_, i) => `<span>${i + 1}</span>`).join("")}</div><div style="width:58px"></div></div>`;
+  for (let y = startY; y <= endY; y++) {
+    let blocks = "", yf = 0, yt = 0;
+    for (let m = 1; m <= 12; m++) {
+      let f = 0, t = 0, owed = false;
+      for (let d = 1; d <= daysInMonth(y, m); d++) {
+        const st = boxState(`${y}-${pad(m)}-${pad(d)}`);
+        if (st === "before") continue;
+        t++;
+        if (st === "filled") f++;
+        if (st === "empty" || st === "next") owed = true;
+      }
+      yf += f; yt += t;
+      const c = t === 0 ? "x" : (!owed && f === 0 ? "u" : "");
+      blocks += `<i class="${c}">${f ? `<b style="width:${f / t * 100}%"></b>` : ""}</i>`;
+    }
+    html += `<button class="yrow ${y === curY ? "cur" : ""}" data-y="${y}"><span class="y">${y}</span><span class="yr">${blocks}</span><span class="c">${yf}/${yt}</span></button>`;
+  }
+  const body = document.getElementById("zoomBody");
+  body.innerHTML = html;
+  body.querySelectorAll("button.yrow").forEach(b => b.onclick = () => { viewYear = Number(b.dataset.y); setZoom("year"); });
+}
+
+document.querySelectorAll(".seg button").forEach(b => b.onclick = () => {
+  if (b.dataset.zoom === "year") viewYear = Number(viewMonth.slice(0, 4));
+  setZoom(b.dataset.zoom);
+});
+document.getElementById("title").onclick = () => {
+  if (zoom === "month") { viewYear = Number(viewMonth.slice(0, 4)); setZoom("year"); }
+  else if (zoom === "year") setZoom("years");
+};
+document.getElementById("prev").onclick = () => {
+  if (zoom === "month") viewMonth = addMonths(viewMonth, -1); else viewYear--;
+  renderZoom();
+};
+document.getElementById("next").onclick = () => {
+  if (zoom === "month") viewMonth = addMonths(viewMonth, 1); else viewYear++;
+  renderZoom();
+};
+
+/* ---------- Selected box ---------- */
+function renderDetail() {
+  const k = selDate;
+  const offset = daysBetween(todayKey(), k);
   const rel = offset === 0 ? "Hôm nay · " : offset === -1 ? "Hôm qua · " : "";
-  document.getElementById("dayTitle").textContent = `${rel}${weekday(selDate)}, ${fmtDate(selDate)}`;
-  document.getElementById("dayCount").textContent = `${list.length} tick`;
-
-  const box = document.getElementById("entries");
-  box.innerHTML = list.length ? "" : `<div class="empty">Chưa có tick nào cho ngày này.</div>`;
-  list.forEach((e, i) => {
-    const a = actById(e.act);
-    const row = document.createElement("div");
-    row.className = "entry";
-    row.innerHTML = `<span class="emoji">${esc(a.emoji)}</span>
-      <div class="txt"><div>${esc(a.name)}</div>${e.note ? `<div>${esc(e.note)}</div>` : ""}</div>
-      <button aria-label="Xoá tick">✕</button>`;
-    row.querySelector("button").onclick = () => {
-      if (!confirm("Xoá tick này?")) return;
-      list.splice(i, 1);
-      if (!list.length) delete state.log[selDate];
-      save(); renderAllCal(); toast("Đã xoá tick");
+  document.getElementById("detailDate").textContent = `Ô ${rel}${weekday(k)}, ${fmtDate(k)}`;
+  const box = document.getElementById("detail");
+  const t = tickAt(k);
+  const st = boxState(k);
+  if (t) {
+    const a = actById(t.act);
+    box.innerHTML = `<div class="detail">
+      <div class="ico" style="background:${a.color}26;color:${a.color}">${svg(a.icon)}</div>
+      <div class="txt"><div class="name">${esc(a.name)}</div>
+        ${t.note ? `<div class="sub" style="color:var(--text)">${esc(t.note)}</div>` : ""}
+        <div class="sub">Làm ngày ${fmtDate(t.done)} · ô thứ ${fmtNum(boxIndex(k) + 1)}</div></div>
+      <button class="del" aria-label="Xoá tick"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`;
+    box.querySelector(".del").onclick = () => {
+      if (!confirm("Xoá tick này? Các tick ở những ô sau sẽ dồn lên 1 ô.")) return;
+      state.ticks.splice(boxIndex(k), 1);
+      save(); renderCal(); toast("Đã xoá tick");
     };
-    box.appendChild(row);
-  });
+  } else if (st === "next") {
+    box.innerHTML = `<div class="sub" style="font-size:14px">Ô trống. Đây là ô tiếp theo sẽ được tick.</div>`;
+  } else if (st === "empty") {
+    box.innerHTML = `<div class="sub" style="font-size:14px">Ô còn nợ. Cần thêm ${fmtNum(boxIndex(k) - state.ticks.length + 1)} tick nữa để tới ô này.</div>`;
+  } else {
+    box.innerHTML = `<div class="sub" style="font-size:14px">Ngày tương lai. Chỉ được điền khi bạn đã trả hết nợ.</div>`;
+  }
+}
 
+/* ---------- Add tick ---------- */
+function renderAdd() {
+  document.getElementById("nextInfo").innerHTML = `Tick tiếp theo sẽ vào ô <b>${fmtDate(nextBox())}</b>`;
   const chips = document.getElementById("chips");
   chips.innerHTML = "";
   for (const a of state.activities.filter(a => !a.archived)) {
     const c = document.createElement("button");
-    c.className = "chip" + (a.id === selAct ? " on" : "");
-    c.textContent = `${a.emoji} ${a.name}`;
-    c.onclick = () => { selAct = a.id; document.getElementById("err").textContent = ""; renderDay(); };
+    const on = a.id === selAct;
+    c.className = "chip" + (on ? " on" : "");
+    if (on) c.style.background = a.color;
+    c.innerHTML = `<span style="color:${on ? "var(--on-lime)" : a.color};display:flex">${svg(a.icon)}</span>${esc(a.name)}`;
+    c.onclick = () => { selAct = a.id; document.getElementById("err").textContent = ""; renderAdd(); };
     chips.appendChild(c);
   }
 }
@@ -352,62 +527,71 @@ function renderDay() {
 function addTick() {
   const err = document.getElementById("err");
   if (!selAct || !state.activities.some(a => a.id === selAct && !a.archived)) { err.textContent = "Chọn một hoạt động trước"; return; }
+  const box = nextBox();
   const noteEl = document.getElementById("note");
-  (state.log[selDate] || (state.log[selDate] = [])).push({ act: selAct, note: noteEl.value.trim(), t: Date.now() });
+  state.ticks.push({ act: selAct, note: noteEl.value.trim(), done: todayKey(), t: Date.now() });
   noteEl.value = "";
-  selAct = null;
-  save(); renderAllCal(); toast("Đã tick ✓");
+  save();
+  // Jump to where the tick landed.
+  selDate = box; viewMonth = box.slice(0, 7); viewYear = Number(box.slice(0, 4));
+  renderCal();
+  toast(`Đã tick ô ${fmtDate(box)}`);
   if (navigator.vibrate) navigator.vibrate(15);
 }
 
-function renderAllCal() { renderSummary(); renderCalendar(); renderDay(); }
+function renderCal() { renderHeader(); renderZoom(); renderDetail(); renderAdd(); }
 
-/* ---------- Stats ---------- */
+/* ---------- Stats (by the real day each tick was done) ---------- */
 function streaks() {
   const today = todayKey();
-  // Current streak counts back from today, or from yesterday if today has no tick yet.
-  let cur = 0, k = dayTotal(today) ? today : addDays(today, -1);
-  while (k >= state.start && dayTotal(k)) { cur++; k = addDays(k, -1); }
-  const days = Object.keys(state.log).filter(d => state.log[d].length).sort();
+  const days = new Set(state.ticks.map(t => t.done));
+  let cur = 0, k = days.has(today) ? today : addDays(today, -1);
+  while (days.has(k)) { cur++; k = addDays(k, -1); }
   let longest = 0, run = 0, prev = null;
-  for (const d of days) { run = prev && daysBetween(prev, d) === 1 ? run + 1 : 1; longest = Math.max(longest, run); prev = d; }
+  for (const d of [...days].sort()) { run = prev && daysBetween(prev, d) === 1 ? run + 1 : 1; longest = Math.max(longest, run); prev = d; }
   return { cur, longest };
 }
 
 function renderStats() {
   const today = todayKey();
   const required = daysBetween(state.start, today);
-  const earned = totalEarned();
+  const earned = state.ticks.length;
   const gap = required - earned;
-  const todayN = dayTotal(today);
-  const avg7 = ticksInLast(7) / 7, avg30 = ticksInLast(30) / 30;
+  const todayN = doneCount(today);
+  const avg7 = doneInLast(7) / 7, avg30 = doneInLast(30) / 30;
   const { cur, longest } = streaks();
+  const perDay = {};
+  for (const t of state.ticks) perDay[t.done] = (perDay[t.done] || 0) + 1;
   let best = 0, bestDate = null;
-  for (const [k, l] of Object.entries(state.log)) if (l.length > best) { best = l.length; bestDate = k; }
+  for (const [k, n] of Object.entries(perDay)) if (n > best || (n === best && k > bestDate)) { best = n; bestDate = k; }
 
-  const set = (id, v) => document.getElementById(id).textContent = v;
-  set("sRequired", fmtNum(required));
-  set("sSince", `từ ${fmtDate(state.start)}`);
-  set("sEarned", fmtNum(earned));
-  set("sPct", `${fmtDec(required ? earned / required * 100 : 0)}% chặng đường`);
+  const set = (id, html) => document.getElementById(id).innerHTML = html;
   set("sGapLabel", gap > 0 ? "Còn nợ" : "Vượt trước");
   set("sGap", fmtNum(Math.abs(gap)));
-  document.getElementById("sGapBox").className = "k " + (gap > 0 ? "bad" : "good");
-  set("sToday", todayN > 1 ? `hôm nay giảm ${todayN - 1}` : todayN === 1 ? "hôm nay giữ nguyên" : "hôm nay +1");
-  set("sStreak", `${cur} ngày`);
-  set("sStreakSub", dayTotal(today) ? "tính cả hôm nay" : "tick hôm nay để giữ chuỗi");
+  document.getElementById("sGap").style.color = gap > 0 ? "" : "var(--lime)";
+  set("sTodayPill", todayN > 1 ? `Hôm nay −${todayN - 1}` : todayN === 1 ? "Hôm nay giữ nguyên" : "Hôm nay +1");
+  document.getElementById("sTodayPill").style.cssText = todayN ? "" : "background:#3A2618;color:var(--debt)";
+  document.getElementById("sBar").style.width = Math.min(100, earned / Math.max(1, required) * 100) + "%";
+  set("sEarned", `<b style="color:var(--text)">${fmtNum(earned)}</b> đã tick`);
+  set("sRequired", `<b style="color:var(--text)">${fmtNum(required)}</b> cần có, từ ${fmtDate(state.start)}`);
+  set("sPaid", earned ? fmtDate(boxDate(earned - 1)) : "Chưa có");
+  set("sPaidSub", `ô tiếp theo: ${fmtDate(nextBox())}`);
+  set("sStreak", `${cur} <small>ngày</small>`);
+  set("sStreakSub", todayN ? "tính cả hôm nay" : "tick hôm nay để giữ chuỗi");
+  set("sLongest", `${longest} <small>ngày</small>`);
   set("sAvg7", fmtDec(avg7));
   set("sAvg30", fmtDec(avg30));
-  set("sBest", `${best} tick`);
+  set("sBest", `${best} <small>tick</small>`);
   set("sBestDate", bestDate ? fmtDate(bestDate) : "chưa có");
-  set("sLongest", `${longest} ngày`);
-  if (gap <= 0) { set("sEta", "Đã trả hết 🎉"); set("sEtaSub", "giữ trên 1 tick/ngày để tiếp tục vượt"); }
+  set("sToday", `${todayN} <small>tick</small>`);
+  set("sTodaySub", todayN > 1 ? `nợ giảm ${todayN - 1}` : todayN === 1 ? "nợ giữ nguyên" : "nợ tăng 1 nếu không tick");
+  if (gap <= 0) { set("sEta", "Đã trả hết"); set("sEtaSub", "Giữ trên 1 tick/ngày để tiếp tục vượt trước."); }
   else if (avg30 > 1) {
     const days = Math.ceil(gap / (avg30 - 1));
     const [y, m] = addDays(today, days).split("-");
     set("sEta", `Tháng ${Number(m)}, ${y}`);
-    set("sEtaSub", `sau ${fmtNum(days)} ngày nếu giữ ${fmtDec(avg30)} tick/ngày (TB 30 ngày)`);
-  } else { set("sEta", "Chưa đuổi kịp"); set("sEtaSub", "cần TB 30 ngày trên 1 tick/ngày thì nợ mới bắt đầu giảm"); }
+    set("sEtaSub", `Sau ${fmtNum(days)} ngày nếu giữ ${fmtDec(avg30)} tick/ngày như 30 ngày qua.`);
+  } else { set("sEta", "Chưa đuổi kịp"); set("sEtaSub", "Cần trung bình 30 ngày trên 1 tick/ngày thì nợ mới bắt đầu giảm."); }
 }
 
 /* ---------- Settings ---------- */
@@ -416,15 +600,20 @@ function renderSettings() {
   box.innerHTML = "";
   for (const a of state.activities.filter(a => !a.archived)) {
     const row = document.createElement("div");
-    row.className = "edit-row";
+    row.className = "arow";
     row.innerHTML = `
-      <input type="text" class="e" maxlength="4" value="${esc(a.emoji)}">
-      <input type="text" class="n" value="${esc(a.name)}">
-      <button class="btn danger" aria-label="Xoá">✕</button>`;
-    const [e, n] = row.querySelectorAll("input");
-    e.onchange = () => { a.emoji = e.value.trim() || "•"; save(); };
+      <button class="ico" aria-label="Đổi icon" style="background:${a.color}26;color:${a.color}">${svg(a.icon)}</button>
+      <input type="text" value="${esc(a.name)}">
+      <button class="del" aria-label="Xoá"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+    const icoBtn = row.querySelector(".ico");
+    let pressTimer, longPressed = false;
+    icoBtn.onpointerdown = () => { longPressed = false; pressTimer = setTimeout(() => { longPressed = true; a.color = COLORS[(COLORS.indexOf(a.color) + 1) % COLORS.length]; save(); renderSettings(); }, 500); };
+    icoBtn.onpointerup = icoBtn.onpointerleave = () => clearTimeout(pressTimer);
+    icoBtn.oncontextmenu = e => e.preventDefault();
+    icoBtn.onclick = () => { if (longPressed) return; a.icon = ICON_KEYS[(ICON_KEYS.indexOf(a.icon) + 1) % ICON_KEYS.length]; save(); renderSettings(); };
+    const n = row.querySelector("input");
     n.onchange = () => { if (n.value.trim()) { a.name = n.value.trim(); save(); } };
-    row.querySelector("button").onclick = () => {
+    row.querySelector(".del").onclick = () => {
       if (!confirm(`Xoá "${a.name}"? Các tick cũ vẫn được giữ.`)) return;
       a.archived = true; if (selAct === a.id) selAct = null; save(); renderSettings();
     };
@@ -439,7 +628,7 @@ function show(view) {
   currentView = view;
   document.querySelectorAll(".view").forEach(v => v.hidden = v.id !== "view-" + view);
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.view === view));
-  if (view === "cal") renderAllCal();
+  if (view === "cal") renderCal();
   if (view === "stats") renderStats();
   if (view === "settings") renderSettings();
   window.scrollTo(0, 0);
@@ -450,56 +639,19 @@ function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<"
 let toastTimer;
 function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 1800); }
 
-document.getElementById("prevMonth").onclick = () => { viewMonth = addMonths(viewMonth, -1); renderCalendar(); };
-document.getElementById("nextMonth").onclick = () => { viewMonth = addMonths(viewMonth, 1); renderCalendar(); };
-// Custom year/month picker: native month inputs show every year, this one only spans start..today.
-let pickYear = null;
-function setPicker(open) {
-  document.getElementById("picker").hidden = !open;
-  document.getElementById("cal").hidden = open;
-  document.getElementById("caret").textContent = open ? "▴" : "▾";
-  if (open) { pickYear = Number(viewMonth.slice(0, 4)); renderPicker(); }
-}
-function renderPicker() {
-  const minYM = state.start.slice(0, 7), maxYM = todayKey().slice(0, 7);
-  const years = document.getElementById("pickYears");
-  years.innerHTML = "";
-  for (let y = Number(maxYM.slice(0, 4)); y >= Number(minYM.slice(0, 4)); y--) {
-    const b = document.createElement("button");
-    b.textContent = y;
-    if (y === pickYear) b.className = "on";
-    b.onclick = () => { pickYear = y; renderPicker(); };
-    years.appendChild(b);
-  }
-  const months = document.getElementById("pickMonths");
-  months.innerHTML = "";
-  for (let m = 1; m <= 12; m++) {
-    const ym = `${pickYear}-${pad(m)}`;
-    const b = document.createElement("button");
-    b.textContent = `Th ${m}`;
-    if (ym === viewMonth) b.className = "on";
-    b.disabled = ym < minYM || ym > maxYM;
-    b.onclick = () => { viewMonth = ym; setPicker(false); renderCalendar(); };
-    months.appendChild(b);
-  }
-}
-document.getElementById("monthTitleBtn").onclick = () => setPicker(document.getElementById("picker").hidden);
-document.getElementById("goToday").onclick = () => { setPicker(false); selDate = todayKey(); viewMonth = selDate.slice(0, 7); renderAllCal(); };
-document.getElementById("addTick").onclick = addTick;
+document.getElementById("tickBtn").onclick = addTick;
 document.getElementById("note").onkeydown = e => { if (e.key === "Enter") addTick(); };
-
 document.getElementById("addAct").onclick = () => {
   const name = document.getElementById("newName").value.trim();
   if (!name) return;
-  const emoji = document.getElementById("newEmoji").value.trim() || "✨";
-  state.activities.push({ id: "a" + Date.now().toString(36), emoji, name });
+  const i = state.activities.length;
+  state.activities.push({ id: "a" + Date.now().toString(36), name, icon: ICON_KEYS[i % ICON_KEYS.length], color: COLORS[i % COLORS.length] });
   document.getElementById("newName").value = "";
-  document.getElementById("newEmoji").value = "";
   save(); renderSettings(); toast("Đã thêm hoạt động");
 };
 document.getElementById("startDate").onchange = e => {
   if (!e.target.value || e.target.value > todayKey()) return;
-  state.start = e.target.value; save(); toast("Đã đổi ngày bắt đầu");
+  state.start = e.target.value; save(); resetView(); toast("Đã đổi ngày bắt đầu");
 };
 document.getElementById("exportBtn").onclick = () => {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
@@ -515,19 +667,20 @@ document.getElementById("importFile").onchange = async e => {
   if (!file) return;
   try {
     const data = JSON.parse(await file.text());
-    if (!data.start || !Array.isArray(data.activities) || typeof data.log !== "object") throw 0;
+    if (!data.start || !Array.isArray(data.activities) || (typeof data.log !== "object" && !Array.isArray(data.ticks))) throw 0;
     if (!confirm("Thay toàn bộ dữ liệu hiện tại bằng file này?")) return;
-    state = migrate(data); save(); show(currentView); toast("Đã nhập dữ liệu");
+    state = migrate(data); save(); resetView(); show(currentView); toast("Đã nhập dữ liệu");
   } catch (err) { toast("File không hợp lệ"); }
   e.target.value = "";
 };
 
-// Roll over to the new day if the app stays open past midnight.
+// Open on the month of the next box to fill, so the frontier is always in view.
+function resetView() { selDate = nextBox(); viewMonth = selDate.slice(0, 7); viewYear = Number(viewMonth.slice(0, 4)); }
+
 let lastToday = todayKey();
 function checkRollover() {
   const t = todayKey();
   if (t === lastToday) return;
-  if (selDate === lastToday) { selDate = t; viewMonth = t.slice(0, 7); }
   lastToday = t;
   show(currentView);
 }
@@ -535,6 +688,8 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden) chec
 setInterval(checkRollover, 60000);
 
 save(); // persist migrated data
+resetView();
+setZoom("month");
 show("cal");
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
