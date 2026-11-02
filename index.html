@@ -144,14 +144,6 @@
   .arow input { flex: 1; }
   .btn { height: 48px; padding: 0 16px; font-weight: 600; }
   .btn.primary { background: var(--lime); color: var(--on-lime); border-color: transparent; }
-  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
-  .toggle input { appearance: none; -webkit-appearance: none; width: 52px; height: 32px; border-radius: 99px; background: var(--line); position: relative; flex-shrink: 0; cursor: pointer; transition: background .2s; margin: 0; }
-  .toggle input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--text); transition: transform .2s; }
-  .toggle input:checked { background: var(--lime); }
-  .toggle input:checked::after { transform: translateX(20px); background: var(--on-lime); }
-  .steps { margin: 10px 0 0; padding-left: 20px; font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .steps b { color: var(--text); font-weight: 600; }
-
   /* Tabs */
   .tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; background: #13161C; border-top: 1px solid var(--card-line); padding: 8px 0 calc(env(safe-area-inset-bottom) + 8px); z-index: 10; }
   .tabs button { flex: 1; max-width: 186px; border: none; background: none; border-radius: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--faint); padding: 4px 0; }
@@ -170,15 +162,6 @@
   .btn2 { width: 100%; height: 52px; border-radius: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
   .btn2.danger { color: var(--danger); }
 
-  /* Pomodoro */
-  .pomo { position: fixed; inset: 0; z-index: 40; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 24px; text-align: center; }
-  .ring { position: relative; width: 270px; height: 270px; }
-  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .ring circle { transition: stroke-dashoffset .25s linear; }
-  .ring .time { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; font-weight: 800; letter-spacing: -.03em; }
-  .pomo .row { display: flex; gap: 10px; width: 100%; max-width: 360px; }
-  .pomo .row button { flex: 1; height: 56px; border-radius: 16px; font-size: 16px; font-weight: 700; }
-  .pomo .row button.go { background: var(--lime); color: var(--on-lime); border: none; }
 </style>
 </head>
 <body>
@@ -210,14 +193,7 @@
     </div>
   </div>
 
-  <div class="card">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="ico" style="background:#FF9F6B26;color:var(--debt)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></div>
-      <div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:700">Pomodoro 25 min</div><div class="sub" id="pomoInfo"></div></div>
-    </div>
-    <div class="chips" id="pomoChips"></div>
-    <button class="tickbtn" id="pomoStart"><svg class="i" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg>Start focusing</button>
-  </div>
+  <button class="tickbtn" id="quickTick"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span id="quickTickLabel"></span></button>
 </section>
 
 <section class="view" id="view-stats" hidden>
@@ -254,26 +230,6 @@
     </div>
   </div>
   <div class="card">
-    <label class="toggle">
-      <span><span class="label" style="display:block">iPhone Clock timer</span><span class="sub">Show the Pomodoro in the Dynamic Island and ring an alarm when it ends, even after you close the app.</span></span>
-      <input type="checkbox" id="clockToggle">
-    </label>
-    <details style="margin-top:12px">
-      <summary class="sub" style="cursor:pointer;color:var(--text);font-weight:600">One-time setup (2 minutes)</summary>
-      <ol class="steps">
-        <li>Open the <b>Shortcuts</b> app, tap <b>+</b> to make a new shortcut.</li>
-        <li>Add the action <b>Start Timer</b> and set it to <b>25 minutes</b>.</li>
-        <li>Rename the shortcut to exactly the name below, then tap <b>Done</b>.</li>
-        <li>Optional: in <b>Clock › Timers › When Timer Ends</b>, pick a loud sound. The timer rings even in silent mode.</li>
-        <li>Turn the switch above on and tap <b>Test</b>. The first time, iPhone asks whether Daily Tick may open Shortcuts: allow it.</li>
-      </ol>
-    </details>
-    <div class="arow">
-      <input type="text" id="shortcutName" aria-label="Shortcut name">
-      <button class="btn" id="testShortcut">Test</button>
-    </div>
-  </div>
-  <div class="card">
     <div class="label" style="margin-bottom:10px">Start date</div>
     <input type="date" id="startDate">
   </div>
@@ -303,17 +259,6 @@
     </div>
     <div id="sheetBody"></div>
   </div>
-</div>
-
-<div class="pomo" id="pomo" hidden>
-  <div class="label" id="pomoAct" style="font-size:15px"></div>
-  <div class="ring">
-    <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--raised)" stroke-width="8"/><circle id="pomoArc" cx="60" cy="60" r="54" fill="none" stroke="var(--lime)" stroke-width="8" stroke-linecap="round" stroke-dasharray="339.3" stroke-dashoffset="0"/></svg>
-    <div class="time" id="pomoTime">25:00</div>
-  </div>
-  <div class="sub" id="pomoSub" style="font-size:14px;max-width:320px;line-height:1.5"></div>
-  <div class="row" id="pomoRun"><button id="pomoCancel">Cancel</button><button class="go" id="pomoPause">Pause</button></div>
-  <div class="row" id="pomoDone" hidden><button id="pomoClose">Close</button><button class="go" id="pomoAgain">One more</button></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -383,7 +328,7 @@ function localize(s) {
   const names = { "Học 25 phút": "Study 25 min", "Tắt đèn lên giường trước 22h": "Lights out before 10pm", "Tập thể dục 25 phút": "Exercise 25 min", "Việc có ích khác": "Something good for me" };
   for (const a of s.activities) if (names[a.name]) a.name = names[a.name];
   for (const t of s.ticks) if (t.note === "Pomodoro 25 phút") t.note = "Pomodoro 25 min";
-  s.settings = { clockTimer: false, shortcutName: "Daily Tick 25", ...(s.settings || {}) };
+  delete s.pomo; delete s.settings; // left over from the removed Pomodoro feature
   return s;
 }
 function save() {
@@ -611,17 +556,10 @@ function renderSheet() {
     <div class="chips" id="sheetChips"></div>
     <input type="text" class="note" id="note" placeholder="Reason: finished chapter 3" maxlength="200">
     <button class="tickbtn" id="tickBtn"><svg class="i" viewBox="0 0 24 24" style="stroke-width:2.5"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Tick ${fmtDate(next)}</button>
-    <div class="err" id="err"></div>
-    <button class="btn2" id="sheetPomo"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>Start a 25-min Pomodoro</button>`;
+    <div class="err" id="err"></div>`;
   renderChips("sheetChips", selAct, id => { selAct = id; document.getElementById("err").textContent = ""; });
   document.getElementById("tickBtn").onclick = addTick;
   document.getElementById("note").onkeydown = e => { if (e.key === "Enter") addTick(); };
-  document.getElementById("sheetPomo").onclick = () => {
-    if (!isActive(selAct)) { document.getElementById("err").textContent = "Pick an activity first"; return; }
-    const note = document.getElementById("note").value.trim();
-    closeSheet();
-    startPomo(selAct, note);
-  };
 }
 
 // Ticks always land in the oldest empty box; jump the calendar there.
@@ -642,115 +580,13 @@ function addTick() {
   if (navigator.vibrate) navigator.vibrate(15);
 }
 
-/* ---------- Pomodoro: 25 focused minutes = 1 tick ---------- */
-// ?pomoSec=N shortens the timer for testing.
-const POMO_MS = (Number(new URLSearchParams(location.search).get("pomoSec")) || 25 * 60) * 1000;
-const ARC = 339.3;
-let pomoAct = null, pomoTimer = null, wakeLock = null, audioCtx = null, lastPomoAct = null;
-// state.pomo is { act, note, endAt } while running and { act, note, left } while paused, so it survives closing the app.
+// The big Tick button opens the sheet for the next empty box.
+document.getElementById("quickTick").onclick = () => { openSheet(nextBox()); renderZoom(); };
 
-function renderPomoCard() {
-  if (!isActive(pomoAct)) pomoAct = (activeActs()[0] || {}).id;
-  document.getElementById("pomoInfo").innerHTML = `Finish to auto-tick <b style="color:var(--text)">${fmtDate(nextBox())}</b>` +
-    (state.settings.clockTimer ? "<br>Also starts an iPhone Clock timer" : "<br>Turn on the iPhone Clock timer in Settings for a Dynamic Island countdown");
-  renderChips("pomoChips", pomoAct, id => pomoAct = id);
+function renderCal() {
+  renderHeader(); renderZoom();
+  document.getElementById("quickTickLabel").textContent = `Tick ${fmtDate(nextBox())}`;
 }
-
-function startPomo(act, note) {
-  if (!isActive(act)) { toast("Add an activity first"); return; }
-  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch (e) {}
-  state.pomo = { act, note, endAt: Date.now() + POMO_MS };
-  save();
-  showPomo();
-  if (state.settings.clockTimer) runClockShortcut();
-}
-
-// Web apps can't use the Dynamic Island or schedule alarms, so hand the countdown to the
-// iPhone Clock app through a user-made shortcut that runs "Start Timer: 25 minutes".
-function runClockShortcut() {
-  location.href = `shortcuts://run-shortcut?name=${encodeURIComponent(state.settings.shortcutName)}`;
-}
-
-function showPomo() {
-  document.getElementById("pomo").hidden = false;
-  document.getElementById("pomoRun").hidden = false;
-  document.getElementById("pomoDone").hidden = true;
-  document.getElementById("pomoAct").textContent = actById(state.pomo.act).name;
-  clearInterval(pomoTimer);
-  pomoTimer = setInterval(tickPomo, 250);
-  tickPomo();
-  if (state.pomo && state.pomo.endAt) requestWakeLock();
-}
-
-function tickPomo() {
-  const p = state.pomo;
-  if (!p) return;
-  const left = Math.max(0, p.endAt ? p.endAt - Date.now() : p.left);
-  const sec = Math.ceil(left / 1000);
-  document.getElementById("pomoTime").textContent = `${pad(Math.floor(sec / 60))}:${pad(sec % 60)}`;
-  // Negative offset trims the arc from its start, so the elapsed part sweeps clockwise from 12 o'clock.
-  document.getElementById("pomoArc").style.strokeDashoffset = -ARC * (1 - left / POMO_MS);
-  document.getElementById("pomoPause").textContent = p.endAt ? "Pause" : "Resume";
-  document.getElementById("pomoSub").innerHTML = p.endAt
-    ? `Focusing. When time's up, <b style="color:var(--text)">${fmtDate(nextBox())}</b> gets ticked.`
-    : state.settings.clockTimer ? "Paused. The Clock timer keeps running: pause it from the Dynamic Island too." : "Paused.";
-  if (p.endAt && left <= 0) finishPomo();
-}
-
-function finishPomo() {
-  const p = state.pomo;
-  clearInterval(pomoTimer);
-  releaseWakeLock();
-  state.pomo = null;
-  lastPomoAct = p.act;
-  const box = pushTick(p.act, p.note || "Pomodoro 25 min", keyOf(p.endAt));
-  document.getElementById("pomo").hidden = false;
-  document.getElementById("pomoAct").textContent = actById(p.act).name;
-  document.getElementById("pomoTime").textContent = "Done";
-  document.getElementById("pomoArc").style.strokeDashoffset = 0;
-  document.getElementById("pomoSub").innerHTML = `Ticked <b style="color:var(--text)">${fmtDate(box)}</b>. Take a 5-minute break, then go again.`;
-  document.getElementById("pomoRun").hidden = true;
-  document.getElementById("pomoDone").hidden = false;
-  beep();
-  if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
-}
-
-function beep() {
-  if (!audioCtx) return;
-  try {
-    for (let i = 0; i < 3; i++) {
-      const o = audioCtx.createOscillator(), g = audioCtx.createGain(), at = audioCtx.currentTime + i * 0.35;
-      o.frequency.value = 880;
-      g.gain.setValueAtTime(0.0001, at);
-      g.gain.exponentialRampToValueAtTime(0.3, at + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, at + 0.25);
-      o.connect(g).connect(audioCtx.destination);
-      o.start(at); o.stop(at + 0.3);
-    }
-  } catch (e) {}
-}
-
-async function requestWakeLock() { try { if (navigator.wakeLock && !wakeLock) wakeLock = await navigator.wakeLock.request("screen"); } catch (e) {} }
-function releaseWakeLock() { if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; } }
-
-document.getElementById("pomoStart").onclick = () => startPomo(pomoAct, "");
-document.getElementById("pomoPause").onclick = () => {
-  const p = state.pomo;
-  if (p.endAt) { state.pomo = { act: p.act, note: p.note, left: p.endAt - Date.now() }; releaseWakeLock(); }
-  else { state.pomo = { act: p.act, note: p.note, endAt: Date.now() + p.left }; requestWakeLock(); }
-  save(); tickPomo();
-};
-document.getElementById("pomoCancel").onclick = () => {
-  if (!confirm("Cancel this session? A cancelled session doesn't earn a tick.")) return;
-  state.pomo = null; save();
-  clearInterval(pomoTimer); releaseWakeLock();
-  document.getElementById("pomo").hidden = true;
-  if (state.settings.clockTimer) toast("Stop the Clock timer in the Dynamic Island too");
-};
-document.getElementById("pomoClose").onclick = () => { document.getElementById("pomo").hidden = true; };
-document.getElementById("pomoAgain").onclick = () => startPomo(lastPomoAct, "");
-
-function renderCal() { renderHeader(); renderZoom(); renderPomoCard(); }
 
 /* ---------- Stats (by the real day each tick was done) ---------- */
 function streaks() {
@@ -831,8 +667,6 @@ function renderSettings() {
     box.appendChild(row);
   }
   document.getElementById("startDate").value = state.start;
-  document.getElementById("clockToggle").checked = state.settings.clockTimer;
-  document.getElementById("shortcutName").value = state.settings.shortcutName;
 }
 
 /* ---------- Shell ---------- */
@@ -860,9 +694,6 @@ document.getElementById("addAct").onclick = () => {
   document.getElementById("newName").value = "";
   save(); renderSettings(); toast("Activity added");
 };
-document.getElementById("clockToggle").onchange = e => { state.settings.clockTimer = e.target.checked; save(); };
-document.getElementById("shortcutName").onchange = e => { state.settings.shortcutName = e.target.value.trim() || "Daily Tick 25"; e.target.value = state.settings.shortcutName; save(); };
-document.getElementById("testShortcut").onclick = runClockShortcut;
 document.getElementById("startDate").onchange = e => {
   if (!e.target.value || e.target.value > todayKey()) return;
   state.start = e.target.value; save(); resetView(); toast("Start date changed");
@@ -898,19 +729,13 @@ function checkRollover() {
   lastToday = t;
   show(currentView);
 }
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) return;
-  checkRollover();
-  // Timers stall in the background; catch up (and award the tick) as soon as the app is back.
-  if (state.pomo) { tickPomo(); if (state.pomo && state.pomo.endAt) { wakeLock = null; requestWakeLock(); } }
-});
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkRollover(); });
 setInterval(checkRollover, 60000);
 
 save(); // persist migrated data
 resetView();
 setZoom("month");
 show("cal");
-if (state.pomo) showPomo();
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("sw.js");

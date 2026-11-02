@@ -1,5 +1,5 @@
 // Network-first so updates show up when online; falls back to cache offline.
-const CACHE = "daily-tick-v7";
+const CACHE = "daily-tick-v8";
 const ASSETS = ["./", "index.html", "manifest.webmanifest", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
 
 self.addEventListener("install", e => {
