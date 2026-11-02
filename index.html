@@ -144,6 +144,13 @@
   .arow input { flex: 1; }
   .btn { height: 48px; padding: 0 16px; font-weight: 600; }
   .btn.primary { background: var(--lime); color: var(--on-lime); border-color: transparent; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+  .toggle input { appearance: none; -webkit-appearance: none; width: 52px; height: 32px; border-radius: 99px; background: var(--line); position: relative; flex-shrink: 0; cursor: pointer; transition: background .2s; margin: 0; }
+  .toggle input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--text); transition: transform .2s; }
+  .toggle input:checked { background: var(--lime); }
+  .toggle input:checked::after { transform: translateX(20px); background: var(--on-lime); }
+  .steps { margin: 10px 0 0; padding-left: 20px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .steps b { color: var(--text); font-weight: 600; }
 
   /* Tabs */
   .tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; background: #13161C; border-top: 1px solid var(--card-line); padding: 8px 0 calc(env(safe-area-inset-bottom) + 8px); z-index: 10; }
@@ -244,6 +251,26 @@
     <div class="arow">
       <input type="text" id="newName" placeholder="New activity name">
       <button class="btn primary" id="addAct">Add</button>
+    </div>
+  </div>
+  <div class="card">
+    <label class="toggle">
+      <span><span class="label" style="display:block">iPhone Clock timer</span><span class="sub">Show the Pomodoro in the Dynamic Island and ring an alarm when it ends, even after you close the app.</span></span>
+      <input type="checkbox" id="clockToggle">
+    </label>
+    <details style="margin-top:12px">
+      <summary class="sub" style="cursor:pointer;color:var(--text);font-weight:600">One-time setup (2 minutes)</summary>
+      <ol class="steps">
+        <li>Open the <b>Shortcuts</b> app, tap <b>+</b> to make a new shortcut.</li>
+        <li>Add the action <b>Start Timer</b> and set it to <b>25 minutes</b>.</li>
+        <li>Rename the shortcut to exactly the name below, then tap <b>Done</b>.</li>
+        <li>Optional: in <b>Clock › Timers › When Timer Ends</b>, pick a loud sound. The timer rings even in silent mode.</li>
+        <li>Turn the switch above on and tap <b>Test</b>. The first time, iPhone asks whether Daily Tick may open Shortcuts: allow it.</li>
+      </ol>
+    </details>
+    <div class="arow">
+      <input type="text" id="shortcutName" aria-label="Shortcut name">
+      <button class="btn" id="testShortcut">Test</button>
     </div>
   </div>
   <div class="card">
@@ -356,6 +383,7 @@ function localize(s) {
   const names = { "Học 25 phút": "Study 25 min", "Tắt đèn lên giường trước 22h": "Lights out before 10pm", "Tập thể dục 25 phút": "Exercise 25 min", "Việc có ích khác": "Something good for me" };
   for (const a of s.activities) if (names[a.name]) a.name = names[a.name];
   for (const t of s.ticks) if (t.note === "Pomodoro 25 phút") t.note = "Pomodoro 25 min";
+  s.settings = { clockTimer: false, shortcutName: "Daily Tick 25", ...(s.settings || {}) };
   return s;
 }
 function save() {
@@ -623,7 +651,8 @@ let pomoAct = null, pomoTimer = null, wakeLock = null, audioCtx = null, lastPomo
 
 function renderPomoCard() {
   if (!isActive(pomoAct)) pomoAct = (activeActs()[0] || {}).id;
-  document.getElementById("pomoInfo").innerHTML = `Finish to auto-tick <b style="color:var(--text)">${fmtDate(nextBox())}</b>`;
+  document.getElementById("pomoInfo").innerHTML = `Finish to auto-tick <b style="color:var(--text)">${fmtDate(nextBox())}</b>` +
+    (state.settings.clockTimer ? "<br>Also starts an iPhone Clock timer" : "<br>Turn on the iPhone Clock timer in Settings for a Dynamic Island countdown");
   renderChips("pomoChips", pomoAct, id => pomoAct = id);
 }
 
@@ -633,6 +662,13 @@ function startPomo(act, note) {
   state.pomo = { act, note, endAt: Date.now() + POMO_MS };
   save();
   showPomo();
+  if (state.settings.clockTimer) runClockShortcut();
+}
+
+// Web apps can't use the Dynamic Island or schedule alarms, so hand the countdown to the
+// iPhone Clock app through a user-made shortcut that runs "Start Timer: 25 minutes".
+function runClockShortcut() {
+  location.href = `shortcuts://run-shortcut?name=${encodeURIComponent(state.settings.shortcutName)}`;
 }
 
 function showPomo() {
@@ -657,7 +693,7 @@ function tickPomo() {
   document.getElementById("pomoPause").textContent = p.endAt ? "Pause" : "Resume";
   document.getElementById("pomoSub").innerHTML = p.endAt
     ? `Focusing. When time's up, <b style="color:var(--text)">${fmtDate(nextBox())}</b> gets ticked.`
-    : "Paused.";
+    : state.settings.clockTimer ? "Paused. The Clock timer keeps running: pause it from the Dynamic Island too." : "Paused.";
   if (p.endAt && left <= 0) finishPomo();
 }
 
@@ -709,6 +745,7 @@ document.getElementById("pomoCancel").onclick = () => {
   state.pomo = null; save();
   clearInterval(pomoTimer); releaseWakeLock();
   document.getElementById("pomo").hidden = true;
+  if (state.settings.clockTimer) toast("Stop the Clock timer in the Dynamic Island too");
 };
 document.getElementById("pomoClose").onclick = () => { document.getElementById("pomo").hidden = true; };
 document.getElementById("pomoAgain").onclick = () => startPomo(lastPomoAct, "");
@@ -794,6 +831,8 @@ function renderSettings() {
     box.appendChild(row);
   }
   document.getElementById("startDate").value = state.start;
+  document.getElementById("clockToggle").checked = state.settings.clockTimer;
+  document.getElementById("shortcutName").value = state.settings.shortcutName;
 }
 
 /* ---------- Shell ---------- */
@@ -821,6 +860,9 @@ document.getElementById("addAct").onclick = () => {
   document.getElementById("newName").value = "";
   save(); renderSettings(); toast("Activity added");
 };
+document.getElementById("clockToggle").onchange = e => { state.settings.clockTimer = e.target.checked; save(); };
+document.getElementById("shortcutName").onchange = e => { state.settings.shortcutName = e.target.value.trim() || "Daily Tick 25"; e.target.value = state.settings.shortcutName; save(); };
+document.getElementById("testShortcut").onclick = runClockShortcut;
 document.getElementById("startDate").onchange = e => {
   if (!e.target.value || e.target.value > todayKey()) return;
   state.start = e.target.value; save(); resetView(); toast("Start date changed");
