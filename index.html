@@ -104,7 +104,8 @@
   .yrow .y { width: 40px; font-size: 13px; font-weight: 700; text-align: left; }
   .yrow .yr { flex: 1; display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
   .yrow .yr i { height: 16px; border-radius: 4px; background: var(--line); display: block; position: relative; overflow: hidden; }
-  .yrow .yr i b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--lime); }
+  .yrow .yr i b { position: absolute; left: 0; top: 0; bottom: 0; display: flex; }
+  .yrow .yr i b span { height: 100%; display: block; }
   .yrow .yr i.u { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
   .yrow .yr i.x { visibility: hidden; }
   .yrow .c { width: 58px; text-align: right; font-size: 11px; color: var(--muted); }
@@ -136,6 +137,31 @@
   .k.wide { grid-column: 1 / -1; }
   .k .h { display: flex; align-items: center; gap: 6px; }
   .hero-k .v { font-size: 46px; color: var(--debt); }
+  /* Activity charts */
+  .ctitle { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ctitle span { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .share { display: flex; gap: 2px; height: 12px; border-radius: 99px; overflow: hidden; margin-bottom: 14px; background: var(--raised); }
+  .share i { display: block; height: 100%; }
+  .arow { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+  .arow .ico { width: 34px; height: 34px; border-radius: 11px; }
+  .arow .ico svg { width: 18px; height: 18px; }
+  .arow .nm { flex: 1; min-width: 0; }
+  .arow .nm div:first-child { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .arow .tr { height: 6px; border-radius: 99px; background: var(--raised); margin-top: 6px; overflow: hidden; }
+  .arow .tr i { display: block; height: 100%; border-radius: 99px; }
+  .arow .n { text-align: right; font-size: 15px; font-weight: 700; min-width: 54px; }
+  .arow .n small { display: block; font-size: 11px; font-weight: 500; color: var(--muted); }
+  .chart { position: relative; height: 150px; display: flex; align-items: flex-end; gap: 3px; border-bottom: 1px solid var(--line); padding-right: 38px; }
+  .chart .col { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column-reverse; gap: 2px; background: none; border: none; border-radius: 0; padding: 0; }
+  .chart .col i { display: block; width: 100%; flex-shrink: 0; }
+  .chart .col i:last-child { border-radius: 4px 4px 0 0; }
+  .chart .col.on { background: var(--raised); border-radius: 6px 6px 0 0; }
+  .chart .goal { position: absolute; left: 0; right: 0; border-top: 1.5px dashed var(--faint); pointer-events: none; }
+  .chart .goal span { position: absolute; right: 0; top: -8px; font-size: 10px; line-height: 14px; color: var(--muted); background: var(--card); padding-left: 4px; }
+  .chart .ymax { position: absolute; right: 0; top: 0; font-size: 10px; line-height: 14px; color: var(--faint); pointer-events: none; }
+  .xax { display: flex; justify-content: space-between; font-size: 10px; color: var(--faint); margin-top: 6px; padding-right: 38px; }
+  .cap { font-size: 13px; color: var(--muted); margin-top: 10px; min-height: 36px; line-height: 1.45; }
+  .cap b { color: var(--text); }
   .pill { padding: 6px 10px; border-radius: 99px; background: #262F17; color: var(--lime); font-size: 12px; font-weight: 700; white-space: nowrap; }
 
   /* Settings */
@@ -196,7 +222,7 @@
     </div>
     <div id="zoomBody"></div>
     <div class="legend">
-      <span><i style="background:var(--lime)"></i>Ticked</span>
+      <span id="actLegend" style="display:contents"></span>
       <span><i style="border:2px dashed var(--lime)"></i>Next box</span>
       <span><i style="background:var(--raised);border:1px solid var(--line)"></i>Owed</span>
     </div>
@@ -233,6 +259,11 @@
     <div class="k"><span class="label">Today</span><div class="v" id="sToday"></div><div class="s" id="sTodaySub"></div></div>
     <div class="k wide"><div class="h" style="color:var(--debt)"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg><span class="label">Caught up by</span></div><div class="v" id="sEta" style="font-size:26px"></div><div class="s" id="sEtaSub" style="font-size:13px;line-height:1.5"></div></div>
   </div>
+  <h2 style="font-size:20px;font-weight:800;margin:26px 0 12px">Activities</h2>
+  <div class="seg" id="statSeg"><button data-p="7">7 days</button><button data-p="30" class="on">30 days</button><button data-p="all">All time</button></div>
+  <div class="card"><div class="ctitle">By activity<span id="actTotal"></span></div><div id="actBreak"></div></div>
+  <div class="card"><div class="ctitle"><b id="colTitle" style="font-weight:700">Ticks per day</b><span>tap a bar</span></div>
+    <div class="chart" id="cols"></div><div class="xax" id="xax"></div><div class="cap" id="colCap"></div></div>
 </section>
 
 <section class="view" id="view-settings" hidden>
@@ -421,7 +452,7 @@ function renderHeader() {
 /* ---------- Zoomable calendar: month → year → all years ---------- */
 function setZoom(z) {
   zoom = z;
-  document.querySelectorAll(".seg button").forEach(b => b.classList.toggle("on", b.dataset.zoom === z));
+  document.querySelectorAll(".seg button[data-zoom]").forEach(b => b.classList.toggle("on", b.dataset.zoom === z));
   renderZoom();
 }
 
@@ -454,7 +485,8 @@ function renderMonth(y, m) {
     const k = `${y}-${pad(m)}-${pad(d)}`;
     const st = boxState(k);
     const cls = ["d", st, k === today ? "today" : "", k === selDate ? "sel" : ""].join(" ");
-    html += `<button class="${cls}" data-k="${k}" ${st === "before" ? "disabled" : ""}>${d}</button>`;
+    const fill = st === "filled" ? ` style="background:${actById(tickAt(k).act).color}"` : "";
+    html += `<button class="${cls}" data-k="${k}"${fill} ${st === "before" ? "disabled" : ""}>${d}</button>`;
   }
   const body = document.getElementById("zoomBody");
   body.innerHTML = `<div class="month">${html}</div>`;
@@ -470,10 +502,10 @@ function renderYear(y) {
     const lead = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
     let cells = '<i class="x"></i>'.repeat(lead), filled = 0, total = 0;
     for (let d = 1; d <= daysInMonth(y, m); d++) {
-      const st = boxState(`${ym}-${pad(d)}`);
+      const k = `${ym}-${pad(d)}`, st = boxState(k);
       if (st !== "before") total++;
       if (st === "filled") filled++;
-      cells += `<i class="${cls[st]}"></i>`;
+      cells += st === "filled" ? `<i class="f" style="background:${actById(tickAt(k).act).color}"></i>` : `<i class="${cls[st]}"></i>`;
     }
     const off = ym < minYM || ym > maxYM;
     html += `<button class="mini ${ym === curYM ? "cur" : ""}" data-ym="${ym}" ${off ? "disabled" : ""}>
@@ -492,16 +524,18 @@ function renderYears(startY, endY) {
     let blocks = "", yf = 0, yt = 0;
     for (let m = 1; m <= 12; m++) {
       let f = 0, t = 0, owed = false;
+      const by = {};
       for (let d = 1; d <= daysInMonth(y, m); d++) {
-        const st = boxState(`${y}-${pad(m)}-${pad(d)}`);
+        const k = `${y}-${pad(m)}-${pad(d)}`, st = boxState(k);
         if (st === "before") continue;
         t++;
-        if (st === "filled") f++;
+        if (st === "filled") { f++; const c = actById(tickAt(k).act).color; by[c] = (by[c] || 0) + 1; }
         if (st === "empty" || st === "next") owed = true;
       }
       yf += f; yt += t;
       const c = t === 0 ? "x" : (!owed && f === 0 ? "u" : "");
-      blocks += `<i class="${c}">${f ? `<b style="width:${f / t * 100}%"></b>` : ""}</i>`;
+      const segs = Object.entries(by).map(([col, n]) => `<span style="width:${n / f * 100}%;background:${col}"></span>`).join("");
+      blocks += `<i class="${c}">${f ? `<b style="width:${f / t * 100}%">${segs}</b>` : ""}</i>`;
     }
     html += `<button class="yrow ${y === curY ? "cur" : ""}" data-y="${y}"><span class="y">${y}</span><span class="yr">${blocks}</span><span class="c">${yf}/${yt}</span></button>`;
   }
@@ -510,7 +544,7 @@ function renderYears(startY, endY) {
   body.querySelectorAll("button.yrow").forEach(b => b.onclick = () => { viewYear = Number(b.dataset.y); setZoom("year"); });
 }
 
-document.querySelectorAll(".seg button").forEach(b => b.onclick = () => {
+document.querySelectorAll(".seg button[data-zoom]").forEach(b => b.onclick = () => {
   if (b.dataset.zoom === "year") viewYear = Number(viewMonth.slice(0, 4));
   setZoom(b.dataset.zoom);
 });
@@ -699,8 +733,13 @@ document.getElementById("pomoCancel").onclick = () => {
 document.getElementById("pomoClose").onclick = () => { document.getElementById("pomo").hidden = true; };
 document.getElementById("pomoAgain").onclick = () => startPomo(lastPomoAct, "");
 
+function renderLegend() {
+  document.getElementById("actLegend").innerHTML = activeActs()
+    .map(a => `<span><i style="background:${a.color}"></i>${esc(a.name)}</span>`).join("");
+}
+
 function renderCal() {
-  renderHeader(); renderZoom(); renderPomoCard();
+  renderHeader(); renderZoom(); renderPomoCard(); renderLegend();
   document.getElementById("quickTickLabel").textContent = `Tick ${fmtDate(nextBox())}`;
 }
 
@@ -755,6 +794,99 @@ function renderStats() {
     set("sEta", `${MONTHS[Number(m) - 1]} ${y}`);
     set("sEtaSub", `In ${plural(days, "day")} if you keep your 30-day pace of ${fmtDec(avg30)} ticks/day.`);
   } else { set("sEta", "Not catching up yet"); set("sEtaSub", "Your 30-day average needs to be above 1 tick/day before the debt starts shrinking."); }
+  renderActCharts();
+}
+
+/* ---------- Activity charts ---------- */
+let statPeriod = "30", selCol = null;
+document.querySelectorAll("#statSeg button").forEach(b => b.onclick = () => {
+  statPeriod = b.dataset.p; selCol = null;
+  document.querySelectorAll("#statSeg button").forEach(x => x.classList.toggle("on", x === b));
+  renderActCharts();
+});
+
+// Activities in a stable order: the list order in Settings, then deleted ones.
+function actOrder() {
+  const ids = state.activities.map(a => a.id);
+  for (const t of state.ticks) if (!ids.includes(t.act)) ids.push(t.act);
+  return ids;
+}
+
+function renderActCharts() {
+  const today = todayKey();
+  const from = statPeriod === "all" ? "0000" : addDays(today, -(Number(statPeriod) - 1));
+  const ticks = state.ticks.filter(t => t.done >= from && t.done <= today);
+  const order = actOrder();
+
+  // Breakdown list
+  const count = {};
+  for (const t of ticks) count[t.act] = (count[t.act] || 0) + 1;
+  const total = ticks.length;
+  const rows = order.filter(id => count[id] || isActive(id));
+  const max = Math.max(1, ...rows.map(id => count[id] || 0));
+  document.getElementById("actTotal").textContent = plural(total, "tick");
+  document.getElementById("actBreak").innerHTML = (total ? `<div class="share">${rows.filter(id => count[id]).map(id =>
+      `<i style="flex:${count[id]};background:${actById(id).color}"></i>`).join("")}</div>` : "") +
+    rows.map(id => {
+      const a = actById(id), n = count[id] || 0;
+      return `<div class="arow"><div class="ico" style="background:${a.color}26;color:${a.color}">${svg(a.icon)}</div>
+        <div class="nm"><div>${esc(a.name)}</div><div class="tr"><i style="width:${n / max * 100}%;background:${a.color}"></i></div></div>
+        <div class="n">${fmtNum(n)}<small>${total ? Math.round(n / total * 100) : 0}%</small></div></div>`;
+    }).join("");
+
+  // Columns: one per day for 7/30 days, one per month for all time.
+  let buckets;
+  if (statPeriod === "all") {
+    const first = state.ticks.reduce((m, t) => t.done < m ? t.done : m, today).slice(0, 7);
+    let ym = addMonths(today.slice(0, 7), -11);
+    if (first > ym) ym = first;
+    buckets = [];
+    for (; ym <= today.slice(0, 7); ym = addMonths(ym, 1)) {
+      const [y, m] = ym.split("-").map(Number);
+      buckets.push({ key: ym, label: `${MONTHS[m - 1]} ${y}`, short: MONTHS_SHORT[m - 1], goal: daysInMonth(y, m) });
+    }
+  } else {
+    buckets = [];
+    for (let i = Number(statPeriod) - 1; i >= 0; i--) {
+      const k = addDays(today, -i);
+      buckets.push({ key: k, label: fmtDate(k), short: String(Number(k.slice(8))), goal: 1 });
+    }
+  }
+  for (const b of buckets) b.by = {};
+  const idx = Object.fromEntries(buckets.map((b, i) => [b.key, i]));
+  for (const t of state.ticks) {
+    const b = buckets[idx[statPeriod === "all" ? t.done.slice(0, 7) : t.done]];
+    if (b) b.by[t.act] = (b.by[t.act] || 0) + 1;
+  }
+  for (const b of buckets) b.n = Object.values(b.by).reduce((s, n) => s + n, 0);
+  const daily = statPeriod !== "all";
+  const top = Math.max(daily ? 2 : 1, ...buckets.map(b => b.n));
+  document.getElementById("colTitle").textContent = daily ? "Ticks per day" : "Ticks per month";
+  const H = 150;
+  const px = n => n / top * H;
+  document.getElementById("cols").innerHTML = buckets.map((b, i) =>
+    `<button class="col${selCol === i ? " on" : ""}" data-i="${i}" aria-label="${b.label}: ${b.n}">${order.filter(id => b.by[id]).map(id =>
+      `<i style="height:${Math.max(2, px(b.by[id]) - 2)}px;background:${actById(id).color}"></i>`).join("")}</button>`).join("") +
+    (daily ? `<div class="goal" style="bottom:${px(1)}px"><span>1/day</span></div>` : "") +
+    `<div class="ymax">max ${top}</div>`;
+  const step = Math.ceil(buckets.length / 6);
+  document.getElementById("xax").innerHTML = buckets.map((b, i) =>
+    `<span>${i % step === 0 || i === buckets.length - 1 ? b.short : ""}</span>`).filter((_, i) => i % step === 0 || i === buckets.length - 1).join("");
+
+  const cap = document.getElementById("colCap");
+  const describe = b => `<b>${b.label}</b> · ${plural(b.n, "tick")}${b.n ? ": " + order.filter(id => b.by[id]).map(id => `${esc(actById(id).name)} ${b.by[id]}`).join(", ") : ""}`;
+  if (selCol !== null && buckets[selCol]) cap.innerHTML = describe(buckets[selCol]);
+  else {
+    const days = buckets.filter(b => b.n >= b.goal).length;
+    cap.innerHTML = daily
+      ? `Hit 1+ tick on <b>${days} of ${buckets.length}</b> days. The dashed line is what keeps the debt from growing.`
+      : `Average <b>${fmtDec(buckets.reduce((s, b) => s + b.n, 0) / buckets.length)}</b> ticks per month over ${plural(buckets.length, "month")}.`;
+  }
+  document.querySelectorAll("#cols .col").forEach(c => c.onclick = () => {
+    const i = Number(c.dataset.i);
+    selCol = selCol === i ? null : i;
+    renderActCharts();
+  });
 }
 
 /* ---------- Settings ---------- */
