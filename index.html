@@ -1000,7 +1000,7 @@ show("cal");
 if (state.pomo) showPomo();
 
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
-  navigator.serviceWorker.register("sw.js");
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
 }
 </script>
 </body>
