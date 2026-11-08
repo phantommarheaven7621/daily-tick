@@ -337,12 +337,12 @@ const ICONS = {
   star: '<path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>',
 };
 const ICON_KEYS = Object.keys(ICONS);
-const COLORS = ["#8AB4FF", "#B79CFF", "#FF9F6B", "#C8F169", "#FF7EB6", "#5EE6C8", "#FFD166"];
+const COLORS = ["#34C77B", "#8AB4FF", "#B79CFF", "#FF9F6B", "#C8F169", "#FF7EB6", "#5EE6C8", "#FFD166"];
 const DEFAULT_STATE = {
   version: 3,
   start: "1996-02-26",
   activities: [
-    { id: "study", icon: "book", color: "#8AB4FF", name: "Study 25 min" },
+    { id: "study", icon: "book", color: "#34C77B", name: "Study 25 min" },
     { id: "sleep", icon: "moon", color: "#B79CFF", name: "Lights out before 10pm" },
     { id: "exercise", icon: "pulse", color: "#FF9F6B", name: "Exercise 25 min" },
     { id: "other", icon: "sparkle", color: "#C8F169", name: "Something good for me" },
@@ -387,6 +387,8 @@ function localize(s) {
   const names = { "Học 25 phút": "Study 25 min", "Tắt đèn lên giường trước 22h": "Lights out before 10pm", "Tập thể dục 25 phút": "Exercise 25 min", "Việc có ích khác": "Something good for me" };
   for (const a of s.activities) if (names[a.name]) a.name = names[a.name];
   for (const t of s.ticks) if (t.note === "Pomodoro 25 phút") t.note = "Pomodoro 25 min";
+  // One-time switch of Study from the old blue default to green (keeps any colour picked later).
+  if (!s.studyGreen) { const st = s.activities.find(a => a.id === "study"); if (st && st.color === "#8AB4FF") st.color = "#34C77B"; s.studyGreen = true; }
   delete s.settings; // left over from the removed iPhone Clock timer option
   return s;
 }
